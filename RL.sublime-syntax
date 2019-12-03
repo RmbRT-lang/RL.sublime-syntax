@@ -278,10 +278,10 @@ contexts:
       captures:
         1: keyword
         2: keyword
-    - match: \b(static)\b
+    - match: \b(static)\b|#
       scope: keyword
       set:
-        - match: \b(static)\b
+        - match: \b(static|\#)\b
           scope: invalid.illegal
         - include: function-or-possibly-auto-variable
         - include: class-member
@@ -295,7 +295,7 @@ contexts:
     - include: function-or-variable
     - include: class
   class-member-visible:
-    - match: \b(static|isolated)\b
+    - match: \b(static)\b|#
       scope: keyword
       set:
       - include: comments
