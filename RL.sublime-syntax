@@ -238,13 +238,36 @@ contexts:
     - match: '{{ident}}'
       scope: entity.name.type.rl storage.type.name.rl
       set:
-      - match: "{"
-        scope: open.curly.bracket.block.rl
-        set:
-        - include: blockclose-no-semicolon
-        - include: comments
-        - match: (?=\S)
-          push: class-member
+      - match: ->
+        scope: keyword
+        set: class-inheritance
+      - include: class-body
+  class-inheritance:
+    - match: \b(virtual)\b
+      scope: keyword
+      set: class-inheritance-visibility
+    - include: class-inheritance-visibility
+  class-inheritance-visibility:
+    - match: \b(public|private|protected)\b
+      scope: keyword
+      set: class-inheritance-symbol
+    - include: class-inheritance-symbol
+  class-inheritance-symbol:
+    - match: (?=\S)
+      set: [class-after-inheritance, type-expression-symbol]
+  class-after-inheritance:
+    - match: ","
+      set: class-inheritance
+    - match: (?=\S)
+      set: class-body
+  class-body:
+    - match: "{"
+      scope: open.curly.bracket.block.rl
+      set:
+      - include: blockclose-no-semicolon
+      - include: comments
+      - match: (?=\S)
+        push: class-member
   class-meta:
     - meta_scope: meta.class.rl
     - match: ""
