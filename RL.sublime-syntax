@@ -1,0 +1,1189 @@
+%YAML 1.2
+---
+# http://www.sublimetext.com/docs/3/syntax.html
+name: RmbRT Language
+file_extensions:
+  - rl
+  - rlh
+  - rld
+first_line_match: (\binclude\b.*|\(/(RL|rl)/\))
+scope: source.rl
+variables:
+  ident: \b[a-zA-Z_][a-zA-Z0-9_]*\b
+contexts:
+  main:
+    - match: \(/(RL|rl)/\)
+      scope: constant.language.rl
+    - include: comments
+    - match: \b(include)\b
+      scope: keyword
+      set:
+        - match: (\")(.*)(\")
+          captures:
+            1: keyword.operator.rl
+            3: keyword.operator.rl
+            2: string.double.quote.rl
+          set: main
+        - match: (\')([^/]+?)(/.*)(\')
+          captures:
+            1: keyword.operator.rl
+            4: keyword.operator.rl
+            2: constant.numeric.rl
+            3: string.single.quote.rl
+          set: main
+        - match: (\')(.*)(\')
+          captures:
+            1: keyword.operator.rl
+            3: keyword.operator.rl
+            2: string.double.quote.rl
+          set: main
+    - match: (?=\S)
+      set:
+      - match: (?=\S)
+        push: global
+  global:
+    - include: comments
+    - include: namespace
+    - include: enum
+    - include: templatedecl
+    - include: struct
+    - include: rawtype
+    - include: typedef
+    - include: function-or-variable
+    - include: external-symbol
+    - include: class
+    - match: \S
+      scope: invalid.illegal
+  templatedecl:
+    - match: \[
+      scope: keyword.operator.rl
+      set: [after_template_decl, templatedecl-inner-pre]
+  member-templatedecl:
+    - match: \[
+      scope: keyword.operator.rl
+      set: [after_member_template_decl, templatedecl-inner-pre]
+  templatedecl-inner-pre:
+    - match: \]
+      scope: keyword.operator.rl
+      set: after_template_decl
+    - match: (?=\S)
+      set: templatedecl-inner
+  templatedecl-inner:
+      - match: \]
+        scope: invalid.illegal
+        set: after_template_decl
+      - match: \b\w+\b
+        set:
+        - match: ':'
+          scope: keyword.operator.rl
+          set:
+          - match: \b(type|number)\b
+            scope: keyword.control.rl
+            set: templatedecl-close-or-comma
+          - match: (?=\S)
+            set: [templatedecl-close-or-comma, type-expression]
+      - match: \S
+        scope: invalid.illegal
+  templatedecl-close-or-comma:
+    - match: \,
+      set: templatedecl-inner
+    - match: \]
+      scope: keyword.operator.rl
+      pop: true
+  after_template_decl:
+    - include: function-or-variable
+    - include: class
+    - include: rawtype
+    - include: typedef
+    - match: (?=\S)
+      pop: true
+  after_member_template_decl:
+    - match: \[
+      scope: invalid.illegal
+    - include: class-member
+    - match: (?=\S)
+      pop: true
+  type-identifier:
+    - match: \b([A-Z][a-zA-Z0-9]+|[a-z_][a-z0-9_]*_t)\b
+      scope: storage.type.name
+      pop: true
+    - match: \b[A-Z]\b
+      pop: true
+    - match: '{{ident}}(?=\s*::(?!=))'
+      scope: entity.name.namespace.rl
+      pop: true
+    - match: '{{ident}}'
+      pop: true
+  value-identifier:
+    - match: '\b[mf]([A-Z0-9][a-zA-Z0-9]*|_[a-z0-9_]+)\b'
+      scope: variable.other.readwrite.member.rl
+      pop: true
+    - match: '\bs([A-Z0-9][a-zA-Z0-9]*|_[a-z0-9_]+)\b'
+      scope: variable.other.readwrite.static.rl
+      pop: true
+    - match: '\bk([A-Z0-9][a-zA-Z0-9]*|_[a-z0-9_]+)\b'
+      scope: constant.other.variable.rl
+      pop: true
+    - match: '\b[A-Z_][A-Z0-9_]+\b'
+      scope: constant.numeric.rl
+      pop: true
+    - match: \b[A-Z]\b
+      pop: true
+    - match: '{{ident}}(?=\s*::(?!=))'
+      scope: entity.name.namespace.rl
+      pop: true
+    - match: '{{ident}}(?=\s*\()'
+      scope: meta.function-call.rl
+      pop: true
+    - match: '{{ident}}'
+      pop: true
+  namespace:
+    - match: ::(?!=)
+      scope: keyword.control.rl
+      set:
+      - match: '{{ident}}'
+        scope: entity.name.namespace.rl
+        set:
+        - match: "{"
+          scope: open.curly.bracket.block.rl
+          set:
+          - include: blockclose-no-semicolon
+          - match: (?=\S)
+            push: global
+        - match: (?=\S)
+          set: global
+  enum:
+    - match: \b(enum)\b
+      scope: keyword.rl
+      set:
+      - match: '{{ident}}'
+        scope: storage.type.name.rl
+        set:
+        - match: \{
+          scope: open.curly.bracket.block.rl
+          set:
+          - match: \}
+            scope: close.curly.bracket.block.rl
+            pop: true
+          - include: enum-member-constant
+  enum-member-constant:
+    - match: '{{ident}}'
+      scope: entity.name.function.rl constant.numeric.rl
+      set:
+      - match: :=
+        scope: keyword.operator.rl
+        set: [enum-member-constant]
+      - include: enum-member-after-constant
+  enum-member-after-constant:
+    - match: \,
+      set: enum-member-constant
+    - match: \}
+      scope: close.curly.bracket.block.rl
+      pop: true
+    - match: \S
+      scope: invalid.illegal
+  rawtype:
+    - match: \(
+      scope: keyword.operator.rl
+      set: [rawtype-after-size, expression]
+  rawtype-after-size:
+    - match: \)
+      scope: keyword.operator.rl
+      set:
+      - match: '{{ident}}'
+        scope: entity.name.type.rl storage.type.name.rl
+        set:
+        - match: ";"
+          scope: semi_colon.eol.ccpp
+          pop: true
+        - match: "{"
+          scope: open.curly.bracket.block.rl
+          set:
+          - include: blockclose
+          - match: (?=\S)
+            push: rawtype-member
+  rawtype-member:
+    - match: \b(public|private)\b
+      scope: keyword.rl
+      set:
+      - match: \b(public|private)\b
+        scope: invalid.illegal
+      - include: rawtype-member
+    - match: \b(static)\b
+      scope: keyword.rl
+      set:
+      - include: templatedecl
+      - include: function-or-variable
+    - match: (?=\S)
+      set:
+      - include: templatedecl
+      - include: typedef
+      - include: function
+  typedef:
+    - match: \btype\b
+      scope: keyword.control.rl
+      set:
+      - match: '{{ident}}'
+        scope: entity.name.type.rl storage.type.name.rl
+        set:
+        - match: :=
+          scope: keyword.operator.rl
+          set: [typedef-end, type-expression]
+  typedef-end:
+    - match: ";"
+      scope: semi_colon.eol.ccpp
+      pop: true
+  class:
+    - include: comments
+    - match: '{{ident}}'
+      scope: entity.name.type.rl storage.type.name.rl
+      set:
+      - match: "{"
+        scope: open.curly.bracket.block.rl
+        set:
+        - include: blockclose-no-semicolon
+        - include: comments
+        - match: (?=\S)
+          push: class-member
+  class-meta:
+    - meta_scope: meta.class.rl
+    - match: ""
+      pop: true
+  class-member:
+    - include: comments
+    - match: \b(public|protected|private)\b\s*(:)
+      captures:
+        1: keyword
+        2: keyword
+    - match: \b(static)\b
+      scope: keyword
+      set:
+        - match: \b(static)\b
+          scope: invalid.illegal
+        - include: function-or-possibly-auto-variable
+        - include: class-member
+    - match: \b(public|protected|private)\b
+      scope: keyword
+      set: class-member-visible
+    - include: typedef
+    - include: member-templatedecl
+    - include: constructor
+    - include: destructor
+    - include: function-or-variable
+    - include: class
+  class-member-visible:
+    - match: \b(static|isolated)\b
+      scope: keyword
+      set:
+      - include: comments
+      - include: constructor
+      - include: destructor
+      - include: function-or-variable
+    - include: comments
+    - include: constructor
+    - include: destructor
+    - include: function-or-variable
+  destructor:
+    - match: \b(destructor)\b
+      scope: keyword.rl
+      set:
+      - match: \b(inline)\b
+        scope: keyword.rl
+        set:
+          - include: blockstatement
+          - include: semicolon-close-noerr
+      - include: blockstatement
+      - include: semicolon-close-noerr
+  constructor:
+    - match: \b(constructor)\b
+      scope: keyword.rl
+      set:
+      - match: \(
+        scope: meta.function-call.rl
+        set: [constructor-member, function-1]
+  constructor-member:
+    - match: \b(inline)\b
+      scope: keyword.rl
+      set:
+      - match: \b(inline)\b
+        scope: invalid.illegal
+      - include: constructor-member
+    - match: ':'
+      scope: meta.function-call.rl
+      set: constructor-member-init
+    - include: blockstatement
+    - match: \;
+      scope: semi_colon.eol.ccpp
+      pop: true
+  constructor-member-init:
+    - match: '{{ident}}'
+      scope: variable.other.readwrite.member.c++
+      set:
+        - match: \(
+          scope: meta.function-call.rl
+          set:
+          - match: \b(noinit)\b
+            scope: keyword.rl
+            set:
+            - match: \)
+              scope: meta.function-call.rl
+              set: constructor-after-member-init
+          - match: (?=\S)
+            set: [constructor-after-member-init, arg-or-close]
+  constructor-after-member-init:
+    - include: blockstatement
+    - match: \,
+      set: constructor-member-init
+    - match: ;
+      scope: semi_colon.eol.ccpp
+      pop: true
+    - match: \S+
+      scope: invalid.illegal.rl
+      pop: true
+  external-symbol:
+    - match: \b(extern)\b
+      scope: keyword.rl
+      set:
+      - match: \[
+        set: [external-symbol-after-string, string]
+      - match: (?=\S)
+        set: external-symbol-name
+  external-symbol-after-string:
+    - match: \]
+      set: external-symbol-name
+  external-symbol-name:
+    - match: '{{ident}}'
+      scope: entity.name.function.rl
+      set:
+      - match: ':'
+        set: [semicolon-close, type-expression] 
+  struct:
+    - match: \bstruct\b
+      scope: keyword.control.rl
+      push:
+      - match: '{{ident}}'
+        scope: storage.type.name.rl
+        set:
+        - match: :=
+          scope: keyword.operator.rl
+          set:
+          - match: "{"
+            scope: keyword.operator.rl
+            set:
+            - include: blockclose
+  function-or-variable:
+    - match: '({{ident}})\s*(\()'
+      captures:
+        1: entity.name.function.rl
+        2: meta.function-call.c
+      set: [function-meta, function-4, function-1]
+    - match: '({{ident}})\s*(:)(?![:=])'
+      captures:
+      set: [semicolon-close, variable-initialiser, type-expression]
+  function-or-possibly-auto-variable:
+    - include: function-or-variable
+    - match: (?={{ident}}\s*([#$]|::=))
+      captures:
+      set: [auto-variable, value-identifier]
+  auto-variable:
+    - match: (\#)\s*(\$)?|(\$)\s*(#)?
+      captures:
+        1: keyword.rl
+        2: keyword.rl
+        3: keyword.rl
+        4: keyword.rl
+      set: auto-variable-init
+    - include: auto-variable-init
+  auto-variable-init:
+    - match: ::=
+      scope: keyword.operator.rl
+      set: expression-stmt    
+  function:
+    - match: '\b({{ident}})\b\s*(\()'
+      captures:
+        1: entity.name.function.rl
+        2: meta.function-call.c
+      set: [function-meta, function-4, function-1]
+  function-meta:
+    - meta_scope: meta.function.rl
+    - match: ""
+      pop: true
+  function-1:
+    - include: comments
+    - match: '{{ident}}'
+      set: function-2
+    - match: \)
+      scope: meta.function-call.c
+      pop: true
+    - match: \S+
+      scope: invalid.illegal
+  function-2:
+    - include: comments
+    - match: ','
+      set: function-1
+    - match: ':'
+      set: [function-2.5, type-expression]
+    - match: \S
+      scope: invalid.illegal
+  function-2.5:
+    - include: comments
+    - match: \&\&?
+      scope: storage.modifier.rl
+      set:
+      - match: \&\&?
+        scope: invalid.illegal
+      - include: function-2.5
+    - match: ','
+      set: function-3
+    - match: '\)'
+      scope: meta.function-call.c
+      pop: true
+    - match: \S
+      scope: invalid.illegal
+  function-3:
+    - include: comments
+    - match: '{{ident}}'
+      set: function-2
+  function-4:
+    - match: \@
+      scope: keyword.rl
+      set:
+      - match: \@
+        scope: invalid.illegal
+      - include: function-4
+    - match: '::='
+      scope: keyword.operator.rl
+      set:
+      - match: \b(inline)\b
+        scope: keyword.rl
+        set:
+        - include: comments
+        - include: expression-stmt
+        - match: \S
+          scope: invalid.illegal
+      - include: comments
+      - include: expression-stmt
+    - match: \b(inline)\b
+      scope: keyword.rl
+      set:
+      - match: '::='
+        scope: keyword.operator.rl
+        set: expression-stmt
+      - include: blockstatement
+      - match: (?=\S)
+        set: [function-5, type-expression]
+      - match: \S
+        scope: invalid.illegal
+    - include: blockstatement
+    - match: (?=\S)
+      set: [function-5, type-expression]
+    - match: \S
+      scope: invalid.illegal
+  function-5:
+    - meta_scope: meta.function.rl
+    - include: comments
+    - include: semicolon-close
+    - match: :=
+      scope: keyword.operator.rl
+      set: [semicolon-close, expression]
+    - include: blockstatement
+  semicolon-close:
+    - include: comments
+    - match: ;
+      scope: semi_colon.eol.ccpp
+      pop: true
+    - match: \s*[\r|\n]*$
+      scope: invalid.illegal
+  semicolon-close-noerr:
+    - include: comments
+    - match: ;
+      scope: semi_colon.eol.ccpp
+      pop: true
+  blockclose:
+    - include: comments
+    - match: "}"
+      scope: close.curly.bracket.block.rl
+      pop: true
+  blockclose-no-semicolon:
+    - include: comments
+    - match: "}"
+      scope: close.curly.bracket.block.rl
+      pop: true
+  variable-or-expression-stmt:
+    - include: comments
+    - match: '{{ident}}\s*(::=)'
+      captures:
+        1: keyword.operator.rl
+      set: [semicolon-close, expression]
+    - match: '{{ident}}\s*(:)(?![:=])'
+      set: [semicolon-close, variable-initialiser, type-expression]
+    - match: '{{ident}}\s*(?=#|\$|::=)'
+      set:
+      - match: (#)
+        scope: storage.modifier.qualifier.rl
+        set:
+        - match: \$
+          scope: storage.modifier.qualifier.rl
+          set: [semicolon-close, variable-short-initialiser]
+        - include: variable-short-initialiser
+      - match: \$
+        scope: keyword
+        set:
+        - match: (#)
+          scope: keyword
+          set: [semicolon-close, variable-short-initialiser]
+        - include: variable-short-initialiser
+    - match: (?=\S)
+      set: expression-stmt
+  variable-or-expression:
+    - include: comments
+    - match: '{{ident}}\s*(::=)'
+      captures:
+        1: keyword.operator.rl
+      set: expression
+    - match: '{{ident}}\s*(:)(?![:=])'
+      captures:
+        1: keyword.operator.rl
+      set: [variable-initialiser, type-expression]
+    - match: '{{ident}}\s*(?=#|\$|::=)'
+      set:
+      - match: (#|\b(const)\b)
+        scope: keyword
+        set:
+        - match: (\$|\b(volatile)\b)
+          scope: keyword
+          set: variable-short-initialiser
+        - include: variable-short-initialiser
+      - match: (\$|\b(volatile)\b)
+        scope: keyword
+        set:
+        - match: (#|\b(const)\b)
+          scope: keyword
+          set: variable-short-initialiser
+        - include: variable-short-initialiser
+    - match: (?=\S)
+      set: expression-stmt
+  variable-short-initialiser:
+    - match: ::=
+      scope: keyword.operator.rl
+      set: expression
+    - match: \S
+      scope: invalid.illegal
+  variable:
+    - include: comments
+    - match: '{{ident}}'
+      set: variable-expect-colon
+  variable-expect-colon:
+    - include: comments
+    - match: '::='
+      scope: keyword.operator.rl
+      set: expression
+    - match: ':'
+      scope: keyword.operator.rl
+      set: [variable-initialiser, type-expression]
+  variable-initialiser:
+    - include: comments
+    - match: ':='
+      scope: keyword.operator.rl
+      set:
+      - match: \b(noinit)\b
+        scope: keyword
+        pop: true
+      - include: expression
+    - match: \(
+      scope: meta.function-call.rl
+      set: [arg-or-close]
+    - match: (?=\S)
+      pop: true
+  arg-or-close:
+    - include: comments
+    - match: \)
+      scope: meta.function-call.rl
+      pop: true
+    - match: \b(noinit)\b
+      scope: keyword.rl
+      set:
+      - match: \)
+        scope: meta.function-call.rl
+        pop: true
+    - match: (?=\S)
+      set: [constructor-call, expression]
+  constructor-call:
+    - match: ','
+      push: expression
+    - match: \)
+      scope: meta.function-call.rl
+      pop: true
+  arg-comma-or-close:
+    - match: ','
+  type-expression:
+    - include: comments
+    - match: \b(type)\b
+      scope: keyword.rl
+      set:
+      - match: \(
+        set: [type-qualifier, parenthese-close-pop, expression]
+    - match: \b(void|auto)\b
+      scope: keyword.rl
+      set: type-qualifier
+    - include: fn-signature
+    - match: (?={{ident}}|\[)
+      set: [type-qualifier, type-expression-symbol]
+  fn-signature:
+    - match: \(
+      scope: meta.function-call.rl
+      set:
+      - include: comments
+      - match: \(
+        set:
+        - match: \)
+          set:
+          - match: \@|\&
+            scope: keyword.rl
+            set: [fn-signature-end, type-expression]
+          - match: (?=\S)
+            set: [fn-signature-end, type-expression]
+        - match: (?=\S)
+          set: [type-qualifier, fn-signature-after-arg, type-expression]
+      - match: \S
+        scope: invalid
+  type-expression-symbol:
+    - include: comments
+    - match: '{{ident}}(?=::)'
+      scope: entity.name.namespace.rl
+      set: type-expression-after-name
+    - match: '{{ident}}(?!::)'
+      scope: storage.type.name.rl
+      set: type-expression-after-name
+    - match: \[
+      scope: meta.function-call.c
+      set:
+      - include: comments
+      - match: \]
+        scope: meta.function-call.c
+        set: [type-expression-after-name, type-identifier]
+      - match: \#
+        set: [type-expression-after-name, type-expression-template-comma-or-bracketclose, expression]
+      - match: (?=\S)
+        set: [type-expression-after-name, type-expression-template-comma-or-bracketclose, type-expression]
+  expression-symbol:
+    - include: comments
+    - match: (?={{ident}})
+      set: [expression-after-name, value-identifier]
+    - match: \[
+      scope: meta.function-call.c
+      set:
+      - include: comments
+      - match: \]
+        scope: meta.function-call.c
+        set: [expression-after-name, value-identifier]
+      - match: \#
+        set: [expression-after-name, expression-template-comma-or-bracketclose, expression]
+      - match: (?=\S)
+        set: [expression-after-name, expression-template-comma-or-bracketclose, type-expression]
+  type-expression-template-comma-or-bracketclose:
+    - include: comments
+    - match: \,
+      set:
+      - include: comments
+      - match: \]
+        scope: invalid.illegal
+      - match: \#
+        set: [type-expression-template-comma-or-bracketclose, expression]
+      - match: (?=\S)
+        set: [type-expression-template-comma-or-bracketclose, type-expression]
+    - match: \]
+      scope: meta.function-call.c
+      set: [type-expression-after-name, type-identifier]
+    - match: \S+
+      scope: invalid.illegal
+      pop: true
+  expression-template-comma-or-bracketclose:
+    - include: comments
+    - match: \,
+      set:
+      - include: comments
+      - match: \]
+        scope: invalid.illegal
+      - match: \#
+        set: [expression-template-comma-or-bracketclose, expression]
+      - match: (?=\S)
+        set: [expression-template-comma-or-bracketclose, type-expression]
+    - match: \]
+      scope: meta.function-call.c
+      set: [expression-after-name, value-identifier]
+    - match: \S+
+      scope: invalid.illegal
+      pop: true
+  type-expression-after-name:
+    - include: comments
+    - match: '::'
+      scope: meta.function-call.rl
+      set: type-expression-symbol
+    - match: (?=\S)
+      pop: true
+  expression-after-name:
+    - include: comments
+    - match: '::'
+      scope: meta.function-call.rl
+      set: expression-symbol
+    - match: (?=\S)
+      pop: true
+  fn-signature-after-arg:
+    - include: comments
+    - match: \,
+      push: type-expression
+    - match: \)
+      set:
+      - match: \@|\&
+        scope: keyword.rl
+        set: [fn-signature-end, type-expression]
+      - match: (?=\S)
+        set: [fn-signature-end, type-expression]
+    - match: \S
+      scope: invalid.illegal
+  fn-signature-end:
+    - match: \)
+      scope: meta.function-call.rl
+      set: type-indirection
+    - match: \S
+      scope: invalid.illegal
+  type-qualifier:
+    - include: comments
+    - match: (#|\bconst\b)
+      scope: storage.modifier.qualifier.rl
+      set:
+      - include: comments
+      - match: (\$|\bvolatile\b)
+        scope: storage.modifier.qualifier.rl
+        set: type-indirection
+      - include: type-indirection
+      - match: (?=\S)
+        pop: true
+    - match: (\$|\bvolatile\b)
+      scope: storage.modifier.qualifier.rl
+      set:
+      - include: comments
+      - match: (#|\bconst\b)
+        scope: storage.modifier.qualifier.rl
+        set: type-indirection
+      - include: type-indirection
+      - match: (?=\S)
+        pop: true
+    - include: type-indirection
+    - match: (?=\S)
+      pop: true
+  type-indirection:
+    - include: comments
+    - match: (\*|\\|@|\.{2}[!?])
+      scope: storage.modifier.indirection.rl
+      set: type-qualifier
+    - match: (?=\S)
+      pop: true
+  expression:
+    - include: comments
+    - include: string
+    - include: char
+    - match: \b(true|false|null)\b
+      scope: constant.language.rl
+      set: expression-after-operand
+    - match: \b(sizeof)\b
+      scope: keyword.rl
+      set:
+        - match: \(
+          set: [expression-pop-parenthese, type-expression]
+    - match: \.{2}[!?]
+      scope: keyword.rl
+      set:
+        - match: \.{2}[!?]
+          scope: invalid.illegal
+        - include: expression
+    - match: \@@?
+      scope: keyword.control.rl
+      set:
+        - match: \@@?
+          scope: invalid.illegal
+        - match: \.{2}[!?]
+          scope: invalid.illegal
+        - include: expression
+    - match: (\#)\s*(\$)?|(\$)\s*(#)?
+      captures:
+        1: keyword.rl
+        2: keyword.rl
+        3: keyword.rl
+        4: keyword.rl
+    - match: (\+[\+:]?|-[-:]?|~:?|!:?|\*|&|\\)
+      scope: keyword.operator.rl
+      set: expression
+    - match: \(
+      set: [expression-pop-parenthese, expression]
+    - match: (?=\[)
+      set: [expression-after-operand, expression-symbol]
+    - match: \<
+      scope: keyword.rl
+      set: [expression-close-cast-bracket, type-expression]
+    - match: \b(0([xX][0-9a-fA-F]+.[0-9a-fA-F]*|[0-7]+\.[0-7]*)|(0|[1-9][0-9]*)\.[0-9]*)['_][hsdqHSDQ]\b
+      scope: constant.numeric.rl
+      set: expression-after-operand
+    - match: \b(0([xX][0-9a-fA-F]+|[0-7]+)|0|[1-9][0-9]*)\b
+      scope: constant.numeric.rl
+      set: expression-after-operand
+    - match: \b(this)\b
+      scope: variable.language.rl keyword.rl
+      set: expression-after-operand
+    - match: (::)
+      scope: entity.name.namespace.rl
+      set: [expression-after-operand, expression-symbol]
+    - match: (?=\b(\w+)\b)
+      set: [expression-after-operand, expression-symbol]
+    - match: \S
+      scope: invalid.illegal
+  expression-close-cast-bracket:
+    - match: \<
+      scope: keyword.rl
+      push: [type-expression]
+    - match: \>
+      scope: keyword.rl
+      set: expression
+  string-common:
+    - match: \\[nrtfvba0\\]
+      scope: constant.character.escape.rl
+    - match: \\[xX][0-9a-fA-F]{2}
+      scope: constant.character.escape.rl
+    - match: \\[oO][0-3][0-7]{2}
+      scope: constant.character.escape.rl
+    - match: \\[dD]([0-1]\d\d|2[0-4]\d|25[0-5])
+      scope: constant.character.escape.rl
+    - match: \\[oOdD]...
+      scope: invalid.illegal
+  string:
+    - match: (8|(16|32)[lLbB]?)?\"
+      captures:
+        0: punctuation.definition.string.begin.rl
+      set:
+        - meta_scope: string.quoted.double.rl
+        - include: string-common
+        - match: \\\"
+          scope: constant.character.escape.rl
+        - match: \"
+          captures:
+            0: punctuation.definition.string.end.rl
+          set:
+            - include: string
+            - match: (?=\S)
+              set: expression-after-operand
+  char:
+    - match: (8|(16|32)[lLbB]?)?\'
+      captures:
+        0: punctuation.definition.string.begin.rl
+      set:
+        - meta_scope: string.quoted.single.rl
+        - include: string-common
+        - match: \\\'
+          scope: constant.character.escape.rl
+        - match: \'
+          captures:
+            0: punctuation.definition.string.end.rl
+          set: expression-after-operand
+  expression-after-operand:
+    - match: ([\.]|->)
+      scope: period.ccpp
+      set:
+      - match: ([a-zA-Z_][a-zA-Z0-9_]*)
+        scope: variable.other.readwrite.member.rl
+        set: expression-after-operand
+      - match: \S
+        scope: invalid.illegal
+    - match: \@@?
+      scope: keyword.control.rl
+      set: expression-post-operator
+    - include: comments
+    - include: expression-post-operator
+  expression-post-operator:
+    - match: (\+\+|--)
+      scope: keyword.operator.rl
+    - match: (<<<?=?|>>>?=?|[-+*/&|<>]=?|[!:=]=)
+      scope: keyword.operator.rl
+      set: expression
+    - match: \!
+      scope: keyword.rl
+      set: expression-after-operand
+    - match: \(
+      scope: meta.function-call.c
+      set: 
+      - match: \)
+        scope: meta.function-call.c
+        set: expression-after-operand
+      - match: (?=\S)
+        set: [call-arguments, expression]
+    - match: \[
+      set: [expression-pop-bracket, expression]
+    - match: \?
+      scope: keyword.control.rl
+      set: [expression-ternary-colon, expression]
+    - match: (?=\S)
+      pop: true
+  call-arguments:
+    - match: \)
+      scope: meta.function-call.c
+      set: expression-after-operand
+    - match: \,
+      push: expression
+  expression-ternary-colon:
+    - include: comments
+    - match: ':'
+      scope: keyword.control.rl
+      set: expression
+    - match: \S
+      scope: invalid.illegal
+  expression-pop-parenthese:
+    - include: comments
+    - match: \)
+      set: expression-after-operand
+    - match: (?=\S)
+      scope: invalid.illegal
+  expression-pop-bracket:
+    - include: comments
+    - match: \]
+      set: expression-after-operand
+    - match: (?=\S)
+      scope: invalid.illegal
+  statement:
+    - include: comments
+    - include: blockstatement
+    - include: if
+    - include: throw
+    - include: switch
+    - include: case
+    - include: while
+    - include: do-loop
+    - include: break
+    - include: for
+    - include: return
+    - include: variable-or-expression-stmt
+    - match: \S
+      scope: invalid.illegal
+  blockstatement:
+    - match: '{'
+      scope: open.curly.bracket.block.rl
+      set:
+      - include: comments
+      - match: ;
+        scope: semi_colon.eol.ccpp
+        set:
+        - match: \}
+          scope: close.curly.bracket.block.rl
+          pop: true
+        - match: \S
+          scope: invalid.illegal.rl
+      - match: \}
+        scope: close.curly.bracket.block.rl
+        pop: true
+      - match: (?=\S)
+        push: statement
+  expression-stmt:
+    - match: (?=\S)
+      set: [semicolon-close, expression]
+  throw:
+    - match: \b(throw)\b
+      scope: keyword.rl
+      set: expression-stmt
+  if:
+    - match: \b(if)\b
+      scope: keyword.control.rl
+      set: [if-condition, control-label]
+  if-condition:
+      - include: comments
+      - match: \(
+        set: [if-after-condition, expression]
+  if-after-condition:
+    - match: \)
+      set: [if-after-statement, statement]
+  if-after-statement:
+    - match: \b(else)\b
+      scope: keyword.control.rl
+      set: [statement, control-label]
+    - match: (?=\S)
+      pop: true
+  switch:
+    - match: \b(switch)\b
+      scope: keyword.control.rl
+      set: [blockstatement, switch-expression, control-label]
+  switch-expression:
+    - match: \(
+      set: [switch-after-expression, expression]
+  switch-after-expression:
+    - match: \)
+      pop: true
+  case:
+    - match: \b(case)\b
+      scope: keyword.control.rl
+      set: [case-end, expression, control-label]
+    - match: \b(default)\b
+      scope: keyword.control.rl
+      set: [case-end, control-label]
+  control-label:
+    - match: \[
+      scope: comment
+      set:
+      - include: comments
+      - match: \b([a-zA-Z_][a-zA-Z0-9_]*)\b|\".*?\"
+        scope: comment
+        set:
+        - match: \]
+          scope: comment control_label.rl
+          pop: true
+        - match: \S
+          scope: invalid.illegal
+      - match: \]
+        scope: invalid.illegal
+        pop: true
+      - match: \S
+        scope: invalid.illegal
+    - match: (?=\S)
+      pop: true
+  case-end:
+    - match: ':'
+      scope: keyword.control.rl
+      pop: true
+    - match: \s+|\S
+      scope: invalid.illegal
+      pop: true
+  break:
+    - match: \b(break)\b
+      scope: keyword.control.rl
+      set: [semicolon-close, control-label]
+  while:
+    - match: \b(while)\b
+      scope: meta.while.rl keyword.control.rl
+      set:
+      - include: comments
+      - match: \(
+        set: [while-meta, while-after-condition, expression]
+  while-meta:
+    - meta_scope: meta.while.rl
+    - match: ""
+      pop: true
+  while-after-condition:
+    - include: comments
+    - match: \)
+      set: statement
+  do-loop:
+    - match: \b(do)\b
+      scope: keyword.control.rl
+      set: [do-meta, do-condition, control-label]
+  do-meta:
+    - meta_scope: meta.do-loop.rl
+    - match: ""
+      pop: true
+  do-condition:
+    - match: \(
+      set: [do-after-condition, variable-or-expression]
+  do-after-condition:
+    - match: \)
+      set: [do-after-body, statement]
+  do-after-body:
+    - match: \b(for)\b
+      scope: keyword.control.rl
+      set:
+      - match: \(
+        set: for-condition
+    - match: \b(while)
+      scope: keyword.control.rl
+      set:
+      - match: \(
+        set: [parenthese-close-pop, expression]
+  for:
+    - match: \b(for)\b
+      scope: keyword.control.rl
+      set:
+      - match: \(
+        set: [for-condition, variable-or-expression-stmt]
+  for-condition:
+    - match: \;
+      set: for-post-stmt
+    - match: (?=\S)
+      set: [for-post-stmt, expression-stmt]
+  for-post-stmt:
+    - include: parenthese-close-pop
+    - match: (?=\S)
+      set: [parenthese-close-pop, expression]
+  parenthese-close-pop:
+    - match: \)
+      pop: true
+  return:
+    - match: \b(return)\b
+      scope: keyword.control.rl
+      set:
+      - match: \;
+        scope: semi_colon.eol.ccpp
+        pop: true
+      - match: (?=\S)
+        set: [semicolon-close, expression]
+#   main:
+#     - include: comments
+# # strings
+#     - match: (8|(16|32)[BbLl]?)?(\"[^\"]*\"|\'[^\']*\')
+#       scope: string.rl
+# # numbers
+#     - match: \b(0([xX][0-9a-fA-F]+.[0-9a-fA-F]*|[0-7]+\.[0-7]*)|(0|[1-9][0-9]*)\.[0-9]*)['_][hsdqHSDQ]\b
+#       scope: constant.numeric.rl
+#     - match: \b(0([xX][0-9a-fA-F]+|[0-7]+)|0|[1-9][0-9]*)\b
+#       scope: constant.numeric.rl
+# # keywords
+#     - match: \b(if|else|while|for|do|continue|break|return|reflect|switch|case|inline|void|namespace|class|struct|rawtype|union|typedef|public|protected|private|static|dynamic|virtual|const|volatile|isolated|this|number|operator|var|sizeof|constructor|destructor|type|interface|default)\b|@
+#       scope: keyword.control.rl
+# # IL:
+# #    - match: \b__(GOTO|IF|LESS|LESS_EQUAL|EQUAL|NOT_EQUAL|GREATER|GREATER_EQUAL|LABEL|ASM|KEEP|STORE|RESULT|ADD|SUB|LOAD|RESERVE)__\b
+# #      scope: keyword.control.ril
+# # operators
+#     - match: (\+[=\+]?|-[=:->]?|\*[=]?|/[=]?|%=?|![=:]?|\^[=]?|~[:]?|&&?=?|\|\|?=?|\?|:[=:]?|\.(\.\.)?|==|<<?<?=?|>>?>?=?|\\|\$|#)
+#       scope: keyword.operator.rl
+# # type names
+#     - match: \b[A-Z][a-zA-Z0-9]*\b
+#       scope: storage.type.name.rl
+# # function declaration
+#     - match: \b(?<=fn\s)\s*\w+\b
+#       scope: entity.function.rl meta.function.rl support.function.rl
+# # function name
+#     - match: \b\w+\s*(?=({.+})?\s*\()
+#       scope: support.function.rl
+# # namespace
+#     - match: \b\w+\s*(?=::)\b
+#       scope: entity.name.namespace.rl
+#     - match: \b(?<=namespace)\s+[a-z]\w*\b
+#       scope: entity.name.namespace.rl
+# # identifier
+#     - match: \b[a-zA-Z_][a-zA-Z0-9_]*\b
+#       scope: support.identifer.rl
+
+  comments:
+    - match: ^\(/ =\s*(.*?)\s*= /\)$\n?
+      scope: comment.block.c
+      captures:
+        1: meta.toc-list.banner.block.c
+    - include: block-comment
+    - include: line-comment
+  block-comment:
+    - match: \(/
+      captures:
+        0: punctuation.definition.comment.c
+      push:
+        - meta_scope: comment.block.c
+        - match: /\)
+          pop: true
+        - include: block-comment
+    - match: /\).*$
+      scope: invalid.illegal.stray-comment-end.c
+  line-comment:
+    - match: //
+      captures:
+        0: punctuation.definition.comment.c
+      push:
+        - meta_scope: comment.line.double-slash.c++
+        - match: $\n?
+          pop: true
+        - match: \\\s*$(\s|\S)
+          push:
+          - match: \s|\S
+            pop: true
