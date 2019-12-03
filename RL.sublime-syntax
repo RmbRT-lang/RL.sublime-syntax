@@ -288,6 +288,7 @@ contexts:
     - match: \b(public|protected|private)\b
       scope: keyword
       set: class-member-visible
+    - include: class-member-visible
     - include: typedef
     - include: member-templatedecl
     - include: constructor
@@ -302,6 +303,12 @@ contexts:
       - include: constructor
       - include: destructor
       - include: function-or-variable
+      - match: \b(virtual|abstract|override|final)\b
+        scope: keyword
+        set: function
+    - match: \b(virtual|abstract|override|final)\b
+      scope: keyword
+      set: function
     - include: comments
     - include: constructor
     - include: destructor
