@@ -278,6 +278,7 @@ contexts:
       captures:
         1: keyword
         2: keyword
+      pop: true
     - match: \b(static)\b|#
       scope: keyword
       set:
