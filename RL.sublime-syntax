@@ -935,7 +935,7 @@ contexts:
   expression-post-operator:
     - match: (\+\+|--)
       scope: keyword.operator.rl
-    - match: (<<<?=?|>>>?=?|[-+*/&|<>]=?|[!:=]=)
+    - match: (<<<?=?|>>>?=?|\|\||&&|[-+*/&|<>]=?|[!:=]=)
       scope: keyword.operator.rl
       set: expression
     - match: \!
