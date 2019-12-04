@@ -442,8 +442,7 @@ contexts:
       pop: true
   function-1:
     - include: comments
-    - match: '{{ident}}'
-      set: function-2
+    - include: function-3
     - match: \)
       scope: meta.function-call.c
       pop: true
@@ -474,8 +473,10 @@ contexts:
       scope: invalid.illegal
   function-3:
     - include: comments
-    - match: '{{ident}}'
+    - match: '{{ident}}(?=\s*:)'
       set: function-2
+    - match: (?={{ident}})
+      set: [function-2.5, type-expression]
   function-4:
     - match: \@
       scope: keyword.rl
