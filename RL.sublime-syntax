@@ -1033,6 +1033,7 @@ contexts:
     - match: \)
       set: [if-after-statement, statement]
   if-after-statement:
+    - include: comments
     - match: \b(else)\b
       scope: keyword.control.rl
       set: [statement, control-label]
