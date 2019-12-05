@@ -676,6 +676,11 @@ contexts:
         scope: invalid
   type-expression-symbol:
     - include: comments
+    - include: type-expression-symbol-root
+    - match: (::)(?!=)
+      scope: entity.name.namespace.rl
+      set: type-expression-symbol-root
+  type-expression-symbol-root:
     - match: '{{ident}}(?=::)'
       scope: entity.name.namespace.rl
       set: type-expression-after-name
