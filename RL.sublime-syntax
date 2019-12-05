@@ -332,7 +332,7 @@ contexts:
       set:
       - match: \(
         scope: meta.function-call.rl
-        set: [constructor-member, function-1]
+        set: [constructor-member, function-arguments]
   constructor-member:
     - match: \b(inline)\b
       scope: keyword.rl
@@ -408,7 +408,7 @@ contexts:
       captures:
         1: entity.name.function.rl
         2: meta.function-call.c
-      set: [function-meta, function-4, function-1]
+      set: [function-meta, function-after-head, function-arguments]
     - match: '({{ident}})\s*(:)(?![:=])'
       captures:
       set: [semicolon-close, variable-initialiser, type-expression]
@@ -435,55 +435,49 @@ contexts:
       captures:
         1: entity.name.function.rl
         2: meta.function-call.c
-      set: [function-meta, function-4, function-1]
+      set: [function-meta, function-after-head, function-arguments]
   function-meta:
     - meta_scope: meta.function.rl
     - match: ""
       pop: true
-  function-1:
+  function-arguments:
     - include: comments
-    - include: function-3
     - match: \)
       scope: meta.function-call.c
       pop: true
-    - match: \S+
-      scope: invalid.illegal
-  function-2:
+    - match: (?=\S)
+      set: [function-after-arg, function-arg]
+  function-after-arg:
     - include: comments
-    - match: ','
-      set: function-1
-    - match: ':'
-      set: [function-2.5, type-expression]
+    - match: \)
+      scope: meta.function-call.c
+      pop: true
+    - match: \,
+      push: function-arg
     - match: \S
-      scope: invalid.illegal
-  function-2.5:
+      scope: illegal.invalid
+  function-arg:
+    - include: comments
+    - match: '{{ident}}\s*:(?!:)'
+      captures:
+        2: keyword.operator.rl
+      set: [function-arg-ref, type-expression]
+    - match: (?={{ident}})
+      set: [function-arg-ref, type-expression]
+  function-arg-ref:
     - include: comments
     - match: \&\&?
       scope: storage.modifier.rl
-      set:
-      - match: \&\&?
-        scope: invalid.illegal
-      - include: function-2.5
-    - match: ','
-      set: function-3
-    - match: '\)'
-      scope: meta.function-call.c
       pop: true
-    - match: \S
-      scope: invalid.illegal
-  function-3:
-    - include: comments
-    - match: '{{ident}}(?=\s*:)'
-      set: function-2
-    - match: (?={{ident}})
-      set: [function-2.5, type-expression]
-  function-4:
+    - match: (?=\S)
+      pop: true
+  function-after-head:
     - match: \@
       scope: keyword.rl
       set:
       - match: \@
         scope: invalid.illegal
-      - include: function-4
+      - include: function-after-head
     - match: '::='
       scope: keyword.operator.rl
       set:
