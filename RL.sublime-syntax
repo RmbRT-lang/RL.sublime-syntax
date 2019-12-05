@@ -589,7 +589,7 @@ contexts:
           set: variable-short-initialiser
         - include: variable-short-initialiser
     - match: (?=\S)
-      set: expression-stmt
+      set: expression
   variable-short-initialiser:
     - match: ::=
       scope: keyword.operator.rl
@@ -987,6 +987,7 @@ contexts:
     - include: break
     - include: for
     - include: return
+    - include: try
     - include: variable-or-expression-stmt
     - match: \S
       scope: invalid.illegal
@@ -1148,6 +1149,38 @@ contexts:
         pop: true
       - match: (?=\S)
         set: [semicolon-close, expression]
+  try:
+    - match: \b(try)\b
+      scope: keyword.control.rl
+      set: [catch-or-finally, statement]
+  catch-or-finally:
+    - include: catch
+    - include: finally
+    - match: \S
+      scope: illegal.invalid
+  catch:
+    - match: \b(catch)\b
+      scope: keyword.control.rl
+      set: catch-after-kw
+  catch-after-kw:
+    - include: comments
+    - match: \(
+      set: [catch-after-var, function-arg]
+  catch-after-var:
+    - include: comments
+    - match: \)
+      set: [after-catch-body, statement]
+  finally:
+    - include: comments
+    - match: \b(finally)\b
+      scope: keyword.control.rl
+      set: statement
+  after-catch-body:
+    - include: comments
+    - include: catch
+    - include: finally
+    - match: (?=\S)
+      pop: true
   comments:
     - match: ^\(/ =\s*(.*?)\s*= /\)$\n?
       scope: comment.block.c
