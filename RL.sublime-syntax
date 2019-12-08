@@ -1132,7 +1132,7 @@ contexts:
       scope: keyword.control.rl
       set:
       - match: \(
-        set: [for-condition, variable-or-expression-stmt]
+        set: [statement, for-condition, variable-or-expression-stmt]
   for-condition:
     - match: \;
       set: for-post-stmt
