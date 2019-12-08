@@ -1168,7 +1168,7 @@ contexts:
     - include: catch
     - include: finally
     - match: \S
-      scope: illegal.invalid
+      scope: invalid.illegal
   catch:
     - match: \b(catch)\b
       scope: keyword.control.rl
