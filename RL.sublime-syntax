@@ -1018,6 +1018,12 @@ contexts:
     - match: (?=\S)
       set: [semicolon-close, expression]
   throw:
+    - match: \b(throw)\b\s*(...)?\s*(;)
+      captures:
+        1: keyword.rl
+        2: keyword.operator.rl
+        3: semi_colon.eol.ccpp
+      pop: true
     - match: \b(throw)\b
       scope: keyword.rl
       set: expression-stmt
