@@ -1108,10 +1108,11 @@ contexts:
   while:
     - match: \b(while)\b
       scope: meta.while.rl keyword.control.rl
-      set:
+      set: [while-meta, while-after-label, control-label]
+  while-after-label:
       - include: comments
       - match: \(
-        set: [while-meta, while-after-condition, expression]
+        set: [while-after-condition, variable-or-expression]
   while-meta:
     - meta_scope: meta.while.rl
     - match: ""
