@@ -91,10 +91,10 @@ contexts:
       scope: keyword.operator.rl
       pop: true
   after_template_decl:
+    - include: typedef
     - include: function-or-variable
     - include: class
     - include: rawtype
-    - include: typedef
     - match: (?=\S)
       pop: true
   after_member_template_decl:
