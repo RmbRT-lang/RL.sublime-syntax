@@ -1193,7 +1193,10 @@ contexts:
   catch-after-kw:
     - include: comments
     - match: \(
-      set: [catch-after-var, function-arg]
+      set:
+      - include: catch-after-var
+      - match: (?=\S)
+        set: [catch-after-var, function-arg]
   catch-after-var:
     - include: comments
     - match: \)
