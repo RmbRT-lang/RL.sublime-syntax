@@ -1058,10 +1058,14 @@ contexts:
   case:
     - match: \b(case)\b
       scope: keyword.control.rl
-      set: [case-end, expression, control-label]
+      set: [case-after-value, expression, control-label]
     - match: \b(default)\b
       scope: keyword.control.rl
       set: [case-end, control-label]
+  case-after-value:
+    - match: \,
+      push: expression
+    - include: case-end
   control-label:
     - match: \[
       scope: comment
