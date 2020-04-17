@@ -1055,7 +1055,7 @@ contexts:
       set: [blockstatement, switch-expression, control-label]
   switch-expression:
     - match: \(
-      set: [switch-after-expression, expression]
+      set: [switch-after-expression, variable-or-expression]
   switch-after-expression:
     - match: \)
       pop: true
