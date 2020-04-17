@@ -559,6 +559,9 @@ contexts:
       set: [auto-variable]
     - match: (?=\S)
       set: expression-stmt
+  variable-or-expression-stmt-or-empty:
+    - include: semicolon-close
+    - include: variable-or-expression-stmt
   variable-or-expression:
     - include: comments
     - match: '{{ident}}\s*(::=)'
@@ -1145,12 +1148,13 @@ contexts:
   for:
     - match: \b(for)\b
       scope: keyword.control.rl
-      set:
+      set: [for-after-label, control-label]
+  for-after-label:
       - match: \(
-        set: [statement, for-condition, variable-or-expression-stmt]
+        set: [statement, for-condition, variable-or-expression-stmt-or-empty]
   for-condition:
-    - match: \;
-      set: for-post-stmt
+    - match: (?=\;)
+      set: [for-post-stmt, semicolon-close]
     - match: (?=\S)
       set: [for-post-stmt, expression-stmt]
   for-post-stmt:
