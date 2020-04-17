@@ -1035,7 +1035,7 @@ contexts:
   if-condition:
       - include: comments
       - match: \(
-        set: [if-after-condition, expression]
+        set: [if-after-condition, variable-or-expression]
   if-after-condition:
     - match: \)
       set: [if-after-statement, statement]
