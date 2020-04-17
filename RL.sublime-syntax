@@ -1131,7 +1131,10 @@ contexts:
       pop: true
   do-condition:
     - match: \(
-      set: [do-after-condition, variable-or-expression]
+      set:
+        - include: do-after-condition
+        - match: (?=\S)
+          set: [do-after-condition, variable-or-expression]
   do-after-condition:
     - match: \)
       set: [do-after-body, statement]
