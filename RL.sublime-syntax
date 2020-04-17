@@ -918,6 +918,9 @@ contexts:
             0: punctuation.definition.string.end.rl
           set: expression-after-operand
   expression-after-operand:
+    - match: ([\.]|->)\*
+      scope: keyword.operator.rl
+      set: expression
     - match: ([\.]|->)
       scope: period.ccpp
       set:
@@ -937,7 +940,7 @@ contexts:
   expression-post-operator:
     - match: (\+\+|--)
       scope: keyword.operator.rl
-    - match: (<<<?=?|>>>?=?|\|\||&&|[-+*/&|<>]=?|[!:=]=)
+    - match: (<<<?=?|>>>?=?|\|\||&&|[-^+*/&%|<>]=?|[!:=]=)
       scope: keyword.operator.rl
       set: expression
     - match: \!
