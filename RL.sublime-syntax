@@ -695,6 +695,7 @@ contexts:
         scope: meta.function-call.c
         set: [type-expression-after-name, type-identifier]
       - match: \#
+        scope: constant.numeric.rl
         set: [type-expression-after-name, type-expression-template-comma-or-bracketclose, expression]
       - match: (?=\S)
         set: [type-expression-after-name, type-expression-template-comma-or-bracketclose, type-expression]
@@ -710,6 +711,7 @@ contexts:
         scope: meta.function-call.c
         set: [expression-after-name, value-identifier]
       - match: \#
+        scope: constant.numeric.rl
         set: [expression-after-name, expression-template-comma-or-bracketclose, expression]
       - match: (?=\S)
         set: [expression-after-name, expression-template-comma-or-bracketclose, type-expression]
