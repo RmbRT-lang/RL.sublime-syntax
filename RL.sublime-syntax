@@ -418,7 +418,7 @@ contexts:
       captures:
       set: [auto-variable, value-identifier]
   auto-variable:
-    - match: (\#)\s*(\$)?|(\$)\s*(#)?
+    - match: (\#)\s*(\$)?|(\$)\s*(\#)?
       captures:
         1: keyword.rl
         2: keyword.rl
@@ -545,21 +545,7 @@ contexts:
     - match: '{{ident}}\s*(:)(?![:=])'
       set: [semicolon-close, variable-initialiser, type-expression]
     - match: '{{ident}}\s*(?=#|\$|::=)'
-      set:
-      - match: (#)
-        scope: storage.modifier.qualifier.rl
-        set:
-        - match: \$
-          scope: storage.modifier.qualifier.rl
-          set: [semicolon-close, variable-short-initialiser]
-        - include: variable-short-initialiser
-      - match: \$
-        scope: keyword
-        set:
-        - match: (#)
-          scope: keyword
-          set: [semicolon-close, variable-short-initialiser]
-        - include: variable-short-initialiser
+      set: [auto-variable]
     - match: (?=\S)
       set: expression-stmt
   variable-or-expression:
@@ -654,7 +640,7 @@ contexts:
       scope: keyword.rl
       set: type-qualifier
     - include: fn-signature
-    - match: (?={{ident}}|\[)
+    - match: (?={{ident}}|\[|::(?!=))
       set: [type-qualifier, type-expression-symbol]
   fn-signature:
     - match: \(
