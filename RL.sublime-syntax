@@ -295,7 +295,7 @@ contexts:
     - include: member-templatedecl
     - include: constructor
     - include: destructor
-    - include: function-or-variable
+    - include: member-function-or-variable
     - include: class
   class-member-visible:
     - match: \b(static)\b|#
@@ -314,7 +314,7 @@ contexts:
     - include: comments
     - include: constructor
     - include: destructor
-    - include: function-or-variable
+    - include: member-function-or-variable
   destructor:
     - match: \b(destructor)\b
       scope: keyword.rl
@@ -412,6 +412,17 @@ contexts:
     - match: '({{ident}})\s*(:)(?![:=])'
       captures:
       set: [semicolon-close, variable-initialiser, type-expression]
+  member-function-or-variable:
+    - match: '({{ident}})\s*(\()'
+      captures:
+        1: entity.name.function.rl
+        2: meta.function-call.c
+      set: [function-meta, function-after-head, function-arguments]
+    - match: '({{ident}})\s*(:)(?![:=])'
+      captures:
+      set: [semicolon-close, variable-initialiser, type-expression]
+    - match: (?={{ident}}\s*(::|;|\#|\$|\*|&|\\))
+      set: [semicolon-close, type-expression]
   function-or-possibly-auto-variable:
     - include: function-or-variable
     - match: (?={{ident}}\s*([#$]|::=))
