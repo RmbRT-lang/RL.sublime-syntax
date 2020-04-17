@@ -990,6 +990,7 @@ contexts:
     - include: while
     - include: do-loop
     - include: break
+    - include: continue
     - include: for
     - include: return
     - include: try
@@ -1095,6 +1096,10 @@ contexts:
       pop: true
   break:
     - match: \b(break)\b
+      scope: keyword.control.rl
+      set: [semicolon-close, control-label]
+  continue:
+    - match: \b(continue)\b
       scope: keyword.control.rl
       set: [semicolon-close, control-label]
   while:
