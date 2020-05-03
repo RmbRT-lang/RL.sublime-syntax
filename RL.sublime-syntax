@@ -51,6 +51,7 @@ contexts:
     - include: typedef
     - include: function-or-variable
     - include: external-symbol
+    - include: union
     - include: class
     - match: \S
       scope: invalid.illegal
@@ -234,6 +235,13 @@ contexts:
     - match: ";"
       scope: semi_colon.eol.ccpp
       pop: true
+  union:
+    - match: \b(union)\b
+      scope: keyword.rl
+      set:
+        - match: '{{ident}}'
+          scope: entity.name.type.rl storage.type.name.rl
+          set: class-body
   class:
     - include: comments
     - match: '{{ident}}'
@@ -291,6 +299,7 @@ contexts:
       scope: keyword
       set: class-member-visible
     - include: class-member-visible
+    - include: union
     - include: typedef
     - include: member-templatedecl
     - include: constructor
