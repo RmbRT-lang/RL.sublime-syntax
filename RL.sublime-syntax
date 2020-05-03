@@ -10,6 +10,8 @@ first_line_match: (\binclude\b.*|\(/(RL|rl)/\))
 scope: source.rl
 variables:
   ident: \b[a-zA-Z_][a-zA-Z0-9_]*\b
+  lowercase_ident: \b[a-z_][a-zA-Z0-9_]*\b
+  uppercase_ident: \b[A-Z][a-zA-Z0-9_]*\b
 contexts:
   main:
     - match: \(/(RL|rl)/\)
@@ -117,7 +119,25 @@ contexts:
       scope: storage.type.name
       pop: true
   value-identifier:
-    - match: '\b[mf]([A-Z0-9][a-zA-Z0-9]*|_[a-z0-9_]+)\b'
+    - match: '{{lowercase_ident}}(?=\s*::(?!=))'
+      scope: entity.name.namespace.rl
+      pop: true
+    - match: '{{uppercase_ident}}(?=\s*::(?!=))'
+      scope: storage.type.name.rl
+      pop: true
+    - match: '{{lowercase_ident}}(?=\s*\()'
+      scope: meta.function-call.rl
+      pop: true
+    - match: '{{uppercase_ident}}(?=\s*\()'
+      scope: storage.type.name.rl
+      pop: true
+    - match: '(?<=::){{uppercase_ident}}(?!\s*::(?!=))'
+      scope: constant.other.variable.rl
+      pop: true
+    - match: '{{lowercase_ident}}(?=\s*::(?!=))'
+      scope: variable.other.readwrite.member.rl
+      pop: true
+    - match: '\b([A-Z][a-zA-Z0-9]*)\b(?!::(?!=))'
       scope: variable.other.readwrite.member.rl
       pop: true
     - match: '\bs([A-Z0-9][a-zA-Z0-9]*|_[a-z0-9_]+)\b'
@@ -128,14 +148,6 @@ contexts:
       pop: true
     - match: '\b[A-Z_][A-Z0-9_]+\b'
       scope: constant.numeric.rl
-      pop: true
-    - match: \b[A-Z]\b
-      pop: true
-    - match: '{{ident}}(?=\s*::(?!=))'
-      scope: entity.name.namespace.rl
-      pop: true
-    - match: '{{ident}}(?=\s*\()'
-      scope: meta.function-call.rl
       pop: true
     - match: '{{ident}}'
       pop: true
@@ -692,8 +704,11 @@ contexts:
       scope: entity.name.namespace.rl
       set: type-expression-symbol-root
   type-expression-symbol-root:
-    - match: '{{ident}}(?=::)'
+    - match: '{{lowercase_ident}}(?=::)'
       scope: entity.name.namespace.rl
+      set: type-expression-after-name
+    - match: '{{uppercase_ident}}(?=::)'
+      scope: storage.type.name.rl
       set: type-expression-after-name
     - match: '{{ident}}(?!::)'
       scope: storage.type.name.rl
@@ -893,7 +908,7 @@ contexts:
     - match: (::)
       scope: entity.name.namespace.rl
       set: [expression-after-operand, expression-symbol]
-    - match: (?=\b(\w+)\b)
+    - match: (?={{ident}})
       set: [expression-after-operand, expression-symbol]
     - match: \S
       scope: invalid.illegal
@@ -954,8 +969,11 @@ contexts:
       - match: \b(constructor|destructor)\b
         scope: keyword.rl
         set: expression-after-operand
-      - match: ([a-zA-Z_][a-zA-Z0-9_]*)
+      - match: \b([a-zA-Z_][a-zA-Z0-9_]*)\b(?!\s*\()
         scope: variable.other.readwrite.member.rl
+        set: expression-after-operand
+      - match: \b([a-zA-Z_][a-zA-Z0-9_]*)\b(?=\s*\()
+        scope: meta.function-call.c
         set: expression-after-operand
       - match: \S
         scope: invalid.illegal
