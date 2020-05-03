@@ -580,6 +580,11 @@ contexts:
     - match: "}"
       scope: close.curly.bracket.block.rl
       pop: true
+  static-variable-stmt:
+    - include: comments
+    - match: \b(static)\b
+      scope: keyword.rl
+      set: [semicolon-close, variable]
   variable-or-expression-stmt:
     - include: comments
     - match: '{{ident}}\s*(::=)'
@@ -1059,6 +1064,7 @@ contexts:
     - include: for
     - include: return
     - include: try
+    - include: static-variable-stmt
     - include: variable-or-expression-stmt
     - match: \S
       scope: invalid.illegal
