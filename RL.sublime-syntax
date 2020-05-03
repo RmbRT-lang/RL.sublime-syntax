@@ -828,6 +828,12 @@ contexts:
       scope: invalid.illegal
   type-qualifier:
     - include: comments
+    - match: \!
+      scope: keyword.rl
+      set:
+        - match: \!
+          scope: invalid.illegal
+        - include: type-qualifier
     - match: (#)
       scope: storage.modifier.qualifier.rl
       set:
