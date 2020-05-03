@@ -913,12 +913,16 @@ contexts:
     - match: \S
       scope: invalid.illegal
   expression-close-cast-bracket:
-    - match: \<
-      scope: keyword.rl
-      push: [type-expression]
     - match: \>
       scope: keyword.rl
-      set: expression
+      set:
+        - match: \(
+          scope: keyword.rl
+          set: [expression-close-cast-parenthese, expression]
+  expression-close-cast-parenthese:
+    - match: \)
+      scope: keyword.rl
+      set: expression-after-operand
   string-common:
     - match: \\[nrtfvba0\\]
       scope: constant.character.escape.rl
