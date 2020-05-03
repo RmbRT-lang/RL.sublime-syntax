@@ -298,6 +298,7 @@ contexts:
     - match: \b(public|protected|private)\b
       scope: keyword
       set: class-member-visible
+    - include: enum
     - include: class-member-visible
     - include: union
     - include: typedef
@@ -324,6 +325,7 @@ contexts:
     - include: constructor
     - include: destructor
     - include: member-function-or-variable
+    - include: class
   destructor:
     - match: \b(destructor)\b
       scope: keyword.rl
