@@ -803,6 +803,7 @@ contexts:
         scope: storage.modifier.qualifier.rl
         set: type-indirection
       - include: type-indirection
+      - include: type-array
       - match: (?=\S)
         pop: true
     - match: (\$)
@@ -816,6 +817,7 @@ contexts:
       - match: (?=\S)
         pop: true
     - include: type-indirection
+    - include: type-array
     - match: (?=\S)
       pop: true
   type-indirection:
@@ -823,8 +825,20 @@ contexts:
     - match: (\*|\\|@|\.{2}[!?])
       scope: storage.modifier.indirection.rl
       set: type-qualifier
-    - match: (?=\S)
-      pop: true
+  type-array:
+    - include: comments
+    - match: \[
+      set:
+        - include: type-array-close
+        - match: (?=\S)
+          set: [type-array-close, expression]
+  type-array-close:
+    - match: \]
+      set:
+        - include: type-indirection
+        - include: type-array
+        - match: (?=\S)
+          pop: true
   expression:
     - include: comments
     - include: string
