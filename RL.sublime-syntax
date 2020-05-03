@@ -371,20 +371,23 @@ contexts:
       scope: semi_colon.eol.ccpp
       pop: true
   constructor-member-init:
-    - match: '{{ident}}'
+    - match: '{{ident}}(?=\s*\()'
       scope: variable.other.readwrite.member.c++
+      set: constructor-member-init-after-symbol
+    - match: (?=\S)
+      set: [constructor-member-init-after-symbol, type-expression-symbol]
+  constructor-member-init-after-symbol:
+    - match: \(
+      scope: meta.function-call.rl
       set:
-        - match: \(
+      - match: \b(noinit)\b
+        scope: keyword.rl
+        set:
+        - match: \)
           scope: meta.function-call.rl
-          set:
-          - match: \b(noinit)\b
-            scope: keyword.rl
-            set:
-            - match: \)
-              scope: meta.function-call.rl
-              set: constructor-after-member-init
-          - match: (?=\S)
-            set: [constructor-after-member-init, arg-or-close]
+          set: constructor-after-member-init
+      - match: (?=\S)
+        set: [constructor-after-member-init, arg-or-close]
   constructor-after-member-init:
     - include: blockstatement
     - match: \,
