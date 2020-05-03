@@ -181,6 +181,7 @@ contexts:
             pop: true
           - include: enum-member-constant
   enum-member-constant:
+    - include: comments
     - match: '{{ident}}'
       scope: entity.name.function.rl constant.numeric.rl
       set:
