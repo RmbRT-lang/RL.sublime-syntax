@@ -547,6 +547,13 @@ contexts:
     - meta_scope: meta.function.rl
     - include: comments
     - include: semicolon-close
+    - match: (&|&&)
+      scope: storage.modifier.rl
+      set:
+        - match: :=
+          scope: keyword.operator.rl
+          set: [semicolon-close, expression]
+        - include: blockstatement
     - match: :=
       scope: keyword.operator.rl
       set: [semicolon-close, expression]
