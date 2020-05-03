@@ -415,6 +415,9 @@ contexts:
       set:
       - match: ':'
         set: [semicolon-close, type-expression] 
+      - match: '\('
+        scope: meta.function-call.c
+        set: [semicolon-close, type-expression, function-arguments]
   struct:
     - match: \bstruct\b
       scope: keyword.control.rl
