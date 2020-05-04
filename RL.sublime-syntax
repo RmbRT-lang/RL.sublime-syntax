@@ -17,7 +17,7 @@ contexts:
     - match: \(/(RL|rl)/\)
       scope: constant.language.rl
     - include: comments
-    - match: \b(include)\b
+    - match: \b(INCLUDE)\b
       scope: keyword
       set:
         - match: (\")(.*)(\")
@@ -80,7 +80,7 @@ contexts:
         - match: ':'
           scope: keyword.operator.rl
           set:
-          - match: \b(type|number)\b
+          - match: \b(TYPE|NUMBER)\b
             scope: keyword.control.rl
             set: templatedecl-close-or-comma
           - match: (?=\S)
@@ -131,7 +131,7 @@ contexts:
     - match: '{{uppercase_ident}}(?=\s*\()'
       scope: storage.type.name.rl
       pop: true
-    - match: '(?<=::){{uppercase_ident}}(?!\s*::(?!=))'
+    - match: '(?<=::){{lowercase_ident}}(?!\s*::(?!=))'
       scope: constant.other.variable.rl
       pop: true
     - match: '{{lowercase_ident}}(?=\s*::(?!=))'
@@ -167,7 +167,7 @@ contexts:
         - match: (?=\S)
           set: global
   enum:
-    - match: \b(enum)\b
+    - match: \b(ENUM)\b
       scope: keyword.rl
       set:
       - match: '{{ident}}'
@@ -218,13 +218,13 @@ contexts:
           - match: (?=\S)
             push: rawtype-member
   rawtype-member:
-    - match: \b(public|private)\b
+    - match: \b(PUBLIC|PRIVATE)\b
       scope: keyword.rl
       set:
-      - match: \b(public|private)\b
+      - match: \b(PUBLIC|PRIVATE)\b
         scope: invalid.illegal
       - include: rawtype-member
-    - match: \b(static)\b
+    - match: \b(STATIC)\b
       scope: keyword.rl
       set:
       - include: templatedecl
@@ -235,7 +235,7 @@ contexts:
       - include: typedef
       - include: function
   typedef:
-    - match: \btype\b
+    - match: \bTYPE\b
       scope: keyword.control.rl
       set:
       - match: '{{ident}}'
@@ -249,7 +249,7 @@ contexts:
       scope: semi_colon.eol.ccpp
       pop: true
   union:
-    - match: \b(union)\b
+    - match: \b(UNION)\b
       scope: keyword.rl
       set:
         - match: '{{ident}}'
@@ -265,12 +265,12 @@ contexts:
         set: class-inheritance
       - include: class-body
   class-inheritance:
-    - match: \b(virtual)\b
+    - match: \b(VIRTUAL)\b
       scope: keyword
       set: class-inheritance-visibility
     - include: class-inheritance-visibility
   class-inheritance-visibility:
-    - match: \b(public|private|protected)\b
+    - match: \b(PUBLIC|PRIVATE|PROTECTED)\b
       scope: keyword
       set: class-inheritance-symbol
     - include: class-inheritance-symbol
@@ -296,19 +296,19 @@ contexts:
       pop: true
   class-member:
     - include: comments
-    - match: \b(public|protected|private)\b\s*(:)
+    - match: \b(PUBLIC|PROTECTED|PRIVATE)\b\s*(:)
       captures:
         1: keyword
         2: keyword
       pop: true
-    - match: \b(static)\b|#
+    - match: \b(STATIC)\b|#
       scope: keyword
       set:
-        - match: \b(static|\#)\b
+        - match: \b(STATIC|\#)\b
           scope: invalid.illegal
         - include: function-or-possibly-auto-variable
         - include: class-member
-    - match: \b(public|protected|private)\b
+    - match: \b(PUBLIC|PROTECTED|PRIVATE)\b
       scope: keyword
       set: class-member-visible
     - include: enum
@@ -321,17 +321,17 @@ contexts:
     - include: member-function-or-variable
     - include: class
   class-member-visible:
-    - match: \b(static)\b|#
+    - match: \b(STATIC)\b|#
       scope: keyword
       set:
       - include: comments
       - include: constructor
       - include: destructor
       - include: function-or-variable
-      - match: \b(virtual|abstract|override|final)\b
+      - match: \b(VIRTUAL|ABSTRACT|OVERRIDE|FINAL)\b
         scope: keyword
         set: function
-    - match: \b(virtual|abstract|override|final)\b
+    - match: \b(VIRTUAL|ABSTRACT|OVERRIDE|FINAL)\b
       scope: keyword
       set: function
     - include: comments
@@ -340,10 +340,10 @@ contexts:
     - include: member-function-or-variable
     - include: class
   destructor:
-    - match: \b(destructor)\b
+    - match: \b(DESTRUCTOR)\b
       scope: keyword.rl
       set:
-      - match: \b(inline)\b
+      - match: \b(INLINE)\b
         scope: keyword.rl
         set:
           - include: blockstatement
@@ -351,17 +351,17 @@ contexts:
       - include: blockstatement
       - include: semicolon-close-noerr
   constructor:
-    - match: \b(constructor)\b
+    - match: \b(CONSTRUCTOR)\b
       scope: keyword.rl
       set:
       - match: \(
         scope: meta.function-call.rl
         set: [constructor-member, function-arguments]
   constructor-member:
-    - match: \b(inline)\b
+    - match: \b(INLINE)\b
       scope: keyword.rl
       set:
-      - match: \b(inline)\b
+      - match: \b(INLINE)\b
         scope: invalid.illegal
       - include: constructor-member
     - match: ':'
@@ -400,7 +400,7 @@ contexts:
       scope: invalid.illegal.rl
       pop: true
   external-symbol:
-    - match: \b(extern)\b
+    - match: \b(EXTERN)\b
       scope: keyword.rl
       set:
       - match: \[
@@ -522,7 +522,7 @@ contexts:
     - match: '::='
       scope: keyword.operator.rl
       set:
-      - match: \b(inline)\b
+      - match: \b(INLINE)\b
         scope: keyword.rl
         set:
         - include: comments
@@ -531,7 +531,7 @@ contexts:
           scope: invalid.illegal
       - include: comments
       - include: expression-stmt
-    - match: \b(inline)\b
+    - match: \b(INLINE)\b
       scope: keyword.rl
       set:
       - match: '::='
@@ -586,7 +586,7 @@ contexts:
       pop: true
   static-variable-stmt:
     - include: comments
-    - match: \b(static)\b
+    - match: \b(STATIC)\b
       scope: keyword.rl
       set: [semicolon-close, variable]
   variable-or-expression-stmt:
@@ -687,12 +687,12 @@ contexts:
     - match: ','
   type-expression:
     - include: comments
-    - match: \b(type)\b
+    - match: \b(TYPE)\b
       scope: keyword.rl
       set:
       - match: \(
         set: [type-qualifier, parenthese-close-pop, expression]
-    - match: \b(void|auto)\b
+    - match: \b(VOID)\b
       scope: keyword.rl
       set: type-qualifier
     - include: fn-signature
@@ -883,10 +883,10 @@ contexts:
     - include: comments
     - include: string
     - include: char
-    - match: \b(true|false|null)\b
+    - match: \b(TRUE|FALSE|NULL)\b
       scope: constant.language.rl
       set: expression-after-operand
-    - match: \b(sizeof)\b
+    - match: \b(SIZEOF)\b
       scope: keyword.rl
       set:
         - match: \(
@@ -927,7 +927,7 @@ contexts:
     - match: \b(0([xX][0-9a-fA-F]+|[0-7]+)|0|[1-9][0-9]*)\b
       scope: constant.numeric.rl
       set: expression-after-operand
-    - match: \b(this)\b
+    - match: \b(THIS)\b
       scope: variable.language.rl keyword.rl
       set: expression-after-operand
     - match: (::)
@@ -995,7 +995,7 @@ contexts:
     - match: ([\.]|->)
       scope: period.ccpp
       set:
-      - match: \b(constructor|destructor)\b
+      - match: \b(CONSTRUCTOR|DESTRUCTOR)\b
         scope: keyword.rl
         set: expression-after-operand
       - match: \b([a-zA-Z_][a-zA-Z0-9_]*)\b(?!\s*\()
@@ -1100,17 +1100,17 @@ contexts:
     - match: (?=\S)
       set: [semicolon-close, expression]
   throw:
-    - match: \b(throw)\b\s*(\.\.\.)?\s*(;)
+    - match: \b(THROW)\b\s*(\.\.\.)?\s*(;)
       captures:
         1: keyword.rl
         2: keyword.operator.rl
         3: semi_colon.eol.ccpp
       pop: true
-    - match: \b(throw)\b
+    - match: \b(THROW)\b
       scope: keyword.rl
       set: expression-stmt
   if:
-    - match: \b(if)\b
+    - match: \b(IF)\b
       scope: keyword.control.rl
       set: [if-condition, control-label]
   if-condition:
@@ -1122,13 +1122,13 @@ contexts:
       set: [if-after-statement, statement]
   if-after-statement:
     - include: comments
-    - match: \b(else)\b
+    - match: \b(ELSE)\b
       scope: keyword.control.rl
       set: [statement, control-label]
     - match: (?=\S)
       pop: true
   switch:
-    - match: \b(switch)\b
+    - match: \b(SWITCH)\b
       scope: keyword.control.rl
       set: [blockstatement, switch-expression, control-label]
   switch-expression:
@@ -1138,10 +1138,10 @@ contexts:
     - match: \)
       pop: true
   case:
-    - match: \b(case)\b
+    - match: \b(CASE)\b
       scope: keyword.control.rl
       set: [case-after-value, expression, control-label]
-    - match: \b(default)\b
+    - match: \b(DEFAULT)\b
       scope: keyword.control.rl
       set: [case-end, control-label]
   case-after-value:
@@ -1176,15 +1176,15 @@ contexts:
       scope: invalid.illegal
       pop: true
   break:
-    - match: \b(break)\b
+    - match: \b(BREAK)\b
       scope: keyword.control.rl
       set: [semicolon-close, control-label]
   continue:
-    - match: \b(continue)\b
+    - match: \b(CONTINUE)\b
       scope: keyword.control.rl
       set: [semicolon-close, control-label]
   while:
-    - match: \b(while)\b
+    - match: \b(WHILE)\b
       scope: meta.while.rl keyword.control.rl
       set: [while-meta, while-after-label, control-label]
   while-after-label:
@@ -1200,7 +1200,7 @@ contexts:
     - match: \)
       set: statement
   do-loop:
-    - match: \b(do)\b
+    - match: \b(DO)\b
       scope: keyword.control.rl
       set: [do-meta, do-condition, control-label]
   do-meta:
@@ -1217,18 +1217,18 @@ contexts:
     - match: \)
       set: [do-after-body, statement]
   do-after-body:
-    - match: \b(for)\b
+    - match: \b(FOR)\b
       scope: keyword.control.rl
       set:
       - match: \(
         set: for-condition
-    - match: \b(while)
+    - match: \b(WHILE)
       scope: keyword.control.rl
       set:
       - match: \(
         set: [parenthese-close-pop, expression]
   for:
-    - match: \b(for)\b
+    - match: \b(FOR)\b
       scope: keyword.control.rl
       set: [for-after-label, control-label]
   for-after-label:
@@ -1247,7 +1247,7 @@ contexts:
     - match: \)
       pop: true
   return:
-    - match: \b(return)\b
+    - match: \b(RETURN)\b
       scope: keyword.control.rl
       set:
       - match: \;
@@ -1256,7 +1256,7 @@ contexts:
       - match: (?=\S)
         set: [semicolon-close, expression]
   try:
-    - match: \b(try)\b
+    - match: \b(TRY)\b
       scope: keyword.control.rl
       set: [catch-or-finally, statement]
   catch-or-finally:
@@ -1265,7 +1265,7 @@ contexts:
     - match: \S
       scope: invalid.illegal
   catch:
-    - match: \b(catch)\b
+    - match: \b(CATCH)\b
       scope: keyword.control.rl
       set: catch-after-kw
   catch-after-kw:
@@ -1281,7 +1281,7 @@ contexts:
       set: [after-catch-body, statement]
   finally:
     - include: comments
-    - match: \b(finally)\b
+    - match: \b(FINALLY)\b
       scope: keyword.control.rl
       set: statement
   after-catch-body:
