@@ -890,7 +890,12 @@ contexts:
       scope: keyword.rl
       set:
         - match: \(
-          set: [expression-pop-parenthese, type-expression]
+          set:
+            - match: \#
+              scope: constant.numeric.rl
+              set: [expression-pop-parenthese, expression]
+            - match: (?=\S)
+              set: [expression-pop-parenthese, type-expression]
     - match: \.{2}[!?]
       scope: keyword.rl
       set:
