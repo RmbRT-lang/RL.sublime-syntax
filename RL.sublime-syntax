@@ -444,6 +444,7 @@ contexts:
       set: [function-meta, function-after-head, function-arguments]
     - match: '({{ident}})\s*(:)(?![:=])'
       captures:
+        1: constant.numeric.rl
       set: [semicolon-close, variable-initialiser, type-expression]
   member-function-or-variable:
     - match: '({{ident}})\s*(\()'
@@ -453,13 +454,15 @@ contexts:
       set: [function-meta, function-after-head, function-arguments]
     - match: '({{ident}})\s*(:)(?![:=])'
       captures:
+        1: variable.other.readwrite.member.rl
       set: [semicolon-close, variable-initialiser, type-expression]
     - match: (?={{ident}}\s*(::|;|\#|\$|\*|&|\\))
       set: [semicolon-close, type-expression]
   function-or-possibly-auto-variable:
     - include: function-or-variable
-    - match: (?={{ident}}\s*([#$]|::=))
+    - match: ({{ident}})(?=\s*([#$]|::=))
       captures:
+        1: constant.numeric.rl
       set: [auto-variable, value-identifier]
   auto-variable:
     - match: (\#)\s*(\$)?|(\$)\s*(\#)?
@@ -594,13 +597,17 @@ contexts:
       set: [semicolon-close, variable]
   variable-or-expression-stmt:
     - include: comments
-    - match: '{{ident}}\s*(::=)'
+    - match: '({{ident}})\s*(::=)'
       captures:
-        1: keyword.operator.rl
+        1: constant.numeric.rl
+        2: keyword.operator.rl
       set: [semicolon-close, expression]
-    - match: '{{ident}}\s*(:)(?![:=])'
+    - match: '({{ident}})\s*(:)(?![:=])'
+      captures:
+        1: constant.numeric.rl
       set: [semicolon-close, variable-initialiser, type-expression]
-    - match: '{{ident}}\s*(?=#|\$|::=)'
+    - match: '{{ident}}(?=\s*(#|\$|::=))'
+      scope: constant.numeric.rl
       set: [auto-variable]
     - match: (?=\S)
       set: expression-stmt
@@ -644,6 +651,7 @@ contexts:
   variable:
     - include: comments
     - match: '{{ident}}'
+      scope: constant.numeric.rl
       set: variable-expect-colon
   variable-expect-colon:
     - include: comments
