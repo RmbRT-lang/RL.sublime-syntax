@@ -107,6 +107,9 @@ contexts:
     - match: (?=\S)
       pop: true
   type-identifier:
+    - match: \b(CONSTRUCTOR|DESTRUCTOR)\b
+      scope: keyword.rl
+      pop: true
     - match: \b([A-Z][a-zA-Z0-9]+|[a-z_][a-z0-9_]*_t)\b
       scope: storage.type.name
       pop: true
