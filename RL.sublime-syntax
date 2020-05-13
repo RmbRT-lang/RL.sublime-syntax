@@ -193,6 +193,7 @@ contexts:
         set: [enum-member-constant]
       - include: enum-member-after-constant
   enum-member-after-constant:
+    - include: comments
     - match: \,
       set: enum-member-constant
     - match: \}
@@ -525,6 +526,7 @@ contexts:
       set: expression
     - match: \(
       set:
+      - include: comments
       - match: \)
         pop: true
       - match: (?=\S)
@@ -532,6 +534,7 @@ contexts:
     - match: (?=\S)
       pop: true
   function-arg-default-init-after-arg:
+    - include: comments
     - match: \)
       pop: true
     - match: \,
