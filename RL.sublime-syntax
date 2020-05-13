@@ -502,15 +502,15 @@ contexts:
     - match: \,
       push: function-arg
     - match: \S
-      scope: illegal.invalid
+      scope: invalid.illegal
   function-arg:
     - include: comments
     - match: '{{ident}}\s*:(?!:)'
       captures:
         2: keyword.operator.rl
-      set: [function-arg-ref, type-expression]
+      set: [function-arg-default-init, function-arg-ref, type-expression]
     - match: (?={{ident}})
-      set: [function-arg-ref, type-expression]
+      set: [function-arg-default-init, function-arg-ref, type-expression]
   function-arg-ref:
     - include: comments
     - match: \&\&?
@@ -518,6 +518,26 @@ contexts:
       pop: true
     - match: (?=\S)
       pop: true
+  function-arg-default-init:
+    - include: comments
+    - match: :=
+      scope: keyword.operator.rl
+      set: expression
+    - match: \(
+      set:
+      - match: \)
+        pop: true
+      - match: (?=\S)
+        set: [function-arg-default-init-after-arg, expression]
+    - match: (?=\S)
+      pop: true
+  function-arg-default-init-after-arg:
+    - match: \)
+      pop: true
+    - match: \,
+      push: expression
+    - match: \S
+      scope: invalid.illegal
   function-after-head:
     - match: \@
       scope: keyword.rl
