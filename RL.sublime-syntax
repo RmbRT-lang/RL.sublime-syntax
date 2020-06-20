@@ -318,15 +318,7 @@ contexts:
     - match: \b(PUBLIC|PROTECTED|PRIVATE)\b
       scope: keyword
       set: class-member-visible
-    - include: enum
     - include: class-member-visible
-    - include: union
-    - include: typedef
-    - include: member-templatedecl
-    - include: constructor
-    - include: destructor
-    - include: member-function-or-variable
-    - include: class
   class-member-visible:
     - match: \b(STATIC)\b|#
       scope: keyword
@@ -342,6 +334,10 @@ contexts:
       scope: keyword
       set: function
     - include: comments
+    - include: enum
+    - include: union
+    - include: typedef
+    - include: member-templatedecl
     - include: constructor
     - include: destructor
     - include: member-function-or-variable
