@@ -1187,6 +1187,9 @@ contexts:
       push: expression
     - include: case-end
   control-label:
+    - match: "`.*?`"
+      scope: comment control_label.rl
+      pop: true
     - match: \[
       scope: comment
       set:
