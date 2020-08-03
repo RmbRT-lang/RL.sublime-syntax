@@ -582,6 +582,7 @@ contexts:
     - match: (&|&&)
       scope: storage.modifier.rl
       set:
+        - include: semicolon-close
         - match: :=
           scope: keyword.operator.rl
           set: [semicolon-close, expression]
