@@ -177,7 +177,7 @@ contexts:
       scope: keyword.rl
       set:
       - match: '{{ident}}'
-        scope: storage.type.name.rl
+        scope: entity.name.type.rl storage.type.name.rl
         set:
         - match: \{
           scope: open.curly.bracket.block.rl
