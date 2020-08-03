@@ -26,12 +26,13 @@ contexts:
             3: keyword.operator.rl
             2: string.double.quote.rl
           set: main
-        - match: (\')([^/]+?)(/.*)(\')
+        - match: (\')([^/]+)(/.*/)?(.*)(\')
           captures:
             1: keyword.operator.rl
-            4: keyword.operator.rl
             2: constant.numeric.rl
-            3: string.single.quote.rl
+            3: keyword.rl
+            4: string.single.quote.rl
+            5: keyword.operator.rl
           set: main
         - match: (\')(.*)(\')
           captures:
