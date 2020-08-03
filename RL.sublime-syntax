@@ -988,7 +988,7 @@ contexts:
       scope: keyword.rl
       set: expression-after-operand
   string-common:
-    - match: \\[nrtfvba0\\]
+    - match: \\[nrtefvba0\\]
       scope: constant.character.escape.rl
     - match: \\[xX][0-9a-fA-F]{2}
       scope: constant.character.escape.rl
