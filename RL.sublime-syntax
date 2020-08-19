@@ -506,9 +506,9 @@ contexts:
       scope: invalid.illegal
   function-arg:
     - include: comments
-    - match: '{{ident}}\s*:(?!:)'
+    - match: '({{ident}})\s*:(?!:)'
       captures:
-        2: keyword.operator.rl
+        1: constant.numeric.rl
       set: [function-arg-default-init, function-arg-ref, type-expression]
     - match: (?={{ident}})
       set: [function-arg-default-init, function-arg-ref, type-expression]
