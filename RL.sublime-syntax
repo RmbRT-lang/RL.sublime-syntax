@@ -642,9 +642,10 @@ contexts:
     - include: variable-or-expression-stmt
   variable-or-expression:
     - include: comments
-    - match: '{{ident}}\s*(::=)'
+    - match: '({{ident}})\s*(::=)'
       captures:
-        1: keyword.operator.rl
+        1: constant.numeric.rl
+        2: keyword.operator.rl
       set: expression
     - match: '{{ident}}\s*(:)(?![:=])'
       captures:
