@@ -1344,6 +1344,20 @@ contexts:
     - include: block-comment
     - include: line-comment
   block-comment:
+    - match: \(//
+      captures:
+        0: punctuation.definition.comment.c comment.block.c
+      push:
+        - meta_scope: comment.block.c
+        - match: /\)
+          scope: comment.block.c 
+          pop: true
+        - match: (?=.)
+          push:
+          - meta_scope: string.quoted.double.rl
+          - match: (?=/\))
+            pop: true
+          - include: block-comment
     - match: \(/
       captures:
         0: punctuation.definition.comment.c
