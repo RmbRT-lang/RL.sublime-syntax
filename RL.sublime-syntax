@@ -510,7 +510,7 @@ contexts:
       captures:
         1: constant.numeric.rl
       set: [function-arg-default-init, function-arg-ref, type-expression]
-    - match: (?={{ident}})
+    - match: (?=\[|{{ident}})
       set: [function-arg-default-init, function-arg-ref, type-expression]
   function-arg-ref:
     - include: comments
