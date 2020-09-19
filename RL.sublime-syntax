@@ -879,7 +879,11 @@ contexts:
       - include: comments
       - match: (\$)
         scope: storage.modifier.qualifier.rl
-        set: type-indirection
+        set:
+          - include: type-indirection
+          - include: type-array
+          - match: (?=\S)
+            pop: true
       - include: type-indirection
       - include: type-array
       - match: (?=\S)
@@ -890,7 +894,11 @@ contexts:
       - include: comments
       - match: (#)
         scope: storage.modifier.qualifier.rl
-        set: type-indirection
+        set:
+          - include: type-indirection
+          - include: type-array
+          - match: (?=\S)
+            pop: true
       - include: type-indirection
       - match: (?=\S)
         pop: true
