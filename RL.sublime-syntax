@@ -55,6 +55,7 @@ contexts:
     - include: function-or-variable
     - include: external-symbol
     - include: union
+    - include: concept
     - include: class
     - match: \S
       scope: invalid.illegal
@@ -263,6 +264,38 @@ contexts:
         - match: '{{ident}}'
           scope: entity.name.type.rl storage.type.name.rl
           set: class-body
+  concept:
+    - match: \b(CONCEPT)\b
+      scope: keyword.rl
+      set:
+        - match: '{{ident}}'
+          scope: entity.name.type.rl storage.type.name.rl
+          set:
+            - match: "{"
+              scope: open.curly.bracket.block.rl
+              set:
+                - match: "}"
+                  scope: close.curly.bracket.block.rl
+                  pop: true
+                - match: (?=\S)
+                  push: concept-member
+  concept-member:
+    - match: \b(PUBLIC|PRIVATE)\b
+      scope: keyword.rl
+      set:
+      - match: \b(PUBLIC|PRIVATE)\b
+        scope: invalid.illegal
+      - include: concept-member
+    - match: \b(STATIC)\b
+      scope: keyword.rl
+      set:
+      - include: templatedecl
+      - include: function
+    - match: (?=\S)
+      set:
+        - match: "#"
+          scope: keyword
+        - include: function
   class:
     - include: comments
     - match: '{{ident}}'
