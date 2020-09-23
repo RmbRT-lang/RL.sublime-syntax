@@ -127,6 +127,9 @@ contexts:
     - match: \b(CONSTRUCTOR|DESTRUCTOR)\b
       scope: keyword.rl
       pop: true
+    - match: '\b(FROM)\b'
+      scope: keyword.rl
+      pop: true
     - match: '{{lowercase_ident}}(?=\s*::(?!=))'
       scope: entity.name.namespace.rl
       pop: true
