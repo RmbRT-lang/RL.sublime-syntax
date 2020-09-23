@@ -293,8 +293,10 @@ contexts:
       - include: function
     - match: (?=\S)
       set:
+        - include: templatedecl
         - match: "#"
           scope: keyword
+          set: function
         - include: function
   class:
     - include: comments
