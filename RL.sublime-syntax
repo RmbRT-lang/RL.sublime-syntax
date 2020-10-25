@@ -306,6 +306,11 @@ contexts:
     - match: '{{ident}}'
       scope: entity.name.type.rl storage.type.name.rl
       set:
+      - include: class-after-name
+      - match: \b(VIRTUAL)\b
+        scope: keyword
+        set: class-after-name
+  class-after-name:
       - match: ->
         scope: keyword
         set: class-inheritance
