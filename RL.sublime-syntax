@@ -46,6 +46,7 @@ contexts:
         push: global
   global:
     - include: comments
+    - include: test
     - include: namespace
     - include: enum
     - include: templatedecl
@@ -163,6 +164,13 @@ contexts:
       pop: true
     - match: '{{ident}}'
       pop: true
+  test:
+    - match: \b(TEST)\b
+      scope: keyword.rl
+      set:
+        - match: ("[^"]+")
+          scope: string.quoted.double.rl
+          set: blockstatement
   namespace:
     - match: ::(?!=)
       scope: keyword.control.rl
