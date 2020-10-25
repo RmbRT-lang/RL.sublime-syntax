@@ -97,6 +97,7 @@ contexts:
       pop: true
   after_template_decl:
     - include: typedef
+    - include: concept
     - include: function-or-variable
     - include: class
     - include: rawtype
@@ -277,12 +278,14 @@ contexts:
             - match: "{"
               scope: open.curly.bracket.block.rl
               set:
+                - include: comments
                 - match: "}"
                   scope: close.curly.bracket.block.rl
                   pop: true
                 - match: (?=\S)
                   push: concept-member
   concept-member:
+    - include: member-templatedecl
     - match: \b(PUBLIC|PRIVATE)\b
       scope: keyword.rl
       set:
@@ -291,12 +294,9 @@ contexts:
       - include: concept-member
     - match: \b(STATIC)\b
       scope: keyword.rl
-      set:
-      - include: templatedecl
-      - include: function
+      set: function
     - match: (?=\S)
       set:
-        - include: templatedecl
         - match: "#"
           scope: keyword
           set: function
