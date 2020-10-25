@@ -1176,6 +1176,7 @@ contexts:
     - include: for
     - include: return
     - include: try
+    - include: assert
     - include: static-variable-stmt
     - include: variable-or-expression-stmt
     - match: \S
@@ -1395,6 +1396,12 @@ contexts:
     - include: finally
     - match: (?=\S)
       pop: true
+  assert:
+    - match: \b(ASSERT)\b
+      scope: keyword.control.rl
+      set:
+        - match: \(
+          set: [semicolon-close, parenthese-close-pop, expression]
   comments:
     - match: ^\(/ =\s*(.*?)\s*= /\)$\n?
       scope: comment.block.c
