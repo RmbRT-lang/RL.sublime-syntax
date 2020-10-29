@@ -780,13 +780,13 @@ contexts:
       scope: keyword.rl
       set:
       - match: \(
-        set: [type-qualifier, parenthese-close-pop, expression]
+        set: [type-infix-template, type-qualifier, parenthese-close-pop, expression]
     - match: \b(VOID)\b
       scope: keyword.rl
-      set: type-qualifier
+      set: [type-infix-template, type-qualifier]
     - include: fn-signature
     - match: (?={{ident}}|\[|::(?!=))
-      set: [type-qualifier, type-expression-symbol]
+      set: [type-infix-template, type-qualifier, type-expression-symbol]
   fn-signature:
     - match: \(
       scope: meta.function-call.rl
@@ -802,7 +802,7 @@ contexts:
           - match: (?=\S)
             set: [fn-signature-end, type-expression]
         - match: (?=\S)
-          set: [type-qualifier, fn-signature-after-arg, type-expression]
+          set: [type-infix-template, type-qualifier, fn-signature-after-arg, type-expression]
       - match: \S
         scope: invalid
   type-expression-symbol:
@@ -916,6 +916,12 @@ contexts:
       set: type-indirection
     - match: \S
       scope: invalid.illegal
+  type-infix-template:
+    - match: (\-)
+      scope: constant.numeric.rl
+      set: [type-infix-template, type-qualifier, type-expression-symbol]
+    - match: (?=\S)
+      pop: true
   type-qualifier:
     - include: comments
     - match: \!
