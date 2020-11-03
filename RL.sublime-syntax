@@ -1174,7 +1174,6 @@ contexts:
     - include: if
     - include: throw
     - include: switch
-    - include: case
     - include: while
     - include: do-loop
     - include: break
@@ -1239,13 +1238,17 @@ contexts:
   switch:
     - match: \b(SWITCH)\b
       scope: keyword.control.rl
-      set: [blockstatement, switch-expression, control-label]
+      set: [switch-expression, control-label]
   switch-expression:
     - match: \(
-      set: [switch-after-expression, variable-or-expression]
+      set: [switch-body, switch-after-expression, variable-or-expression]
   switch-after-expression:
     - match: \)
       pop: true
+  switch-body:
+    - match: \{
+      scope: open.curly.bracket.block.rl
+      set: case
   case:
     - match: \b(CASE)\b
       scope: keyword.control.rl
@@ -1253,6 +1256,9 @@ contexts:
     - match: \b(DEFAULT)\b
       scope: keyword.control.rl
       set: [case-end, control-label]
+    - match: \S
+      scope: invalid.illegal.rl
+      pop: true
   case-after-value:
     - match: \,
       push: expression
@@ -1283,10 +1289,17 @@ contexts:
   case-end:
     - match: ':'
       scope: keyword.control.rl
-      pop: true
+      set: [after-case-stmt, statement]
     - match: \s+|\S
       scope: invalid.illegal
       pop: true
+  after-case-stmt:
+    - match: ->
+      scope: keyword.control.rl
+      set: case
+    - include: blockclose
+    - match: (?=\S)
+      set: case
   break:
     - match: \b(BREAK)\b
       scope: keyword.control.rl
