@@ -599,7 +599,7 @@ contexts:
       - match: \@
         scope: invalid.illegal
       - include: function-after-head
-    - match: '::='
+    - match: ':?:='
       scope: keyword.operator.rl
       set:
       - match: \b(INLINE)\b
@@ -614,7 +614,7 @@ contexts:
     - match: \b(INLINE)\b
       scope: keyword.rl
       set:
-      - match: '::='
+      - match: ':?:='
         scope: keyword.operator.rl
         set: expression-stmt
       - include: blockstatement
