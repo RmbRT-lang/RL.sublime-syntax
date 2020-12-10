@@ -830,9 +830,9 @@ contexts:
         set: [type-expression-after-name, type-identifier]
       - match: \#
         scope: constant.numeric.rl
-        set: [type-expression-after-name, type-expression-template-comma-or-bracketclose, expression]
+        set: [type-expression-template-comma-or-bracketclose, expression]
       - match: (?=\S)
-        set: [type-expression-after-name, type-expression-template-comma-or-bracketclose, type-expression]
+        set: [type-expression-template-comma-or-bracketclose, type-expression]
   expression-symbol:
     - include: comments
     - match: (?={{ident}})
@@ -846,9 +846,39 @@ contexts:
         set: [expression-after-name, value-identifier]
       - match: \#
         scope: constant.numeric.rl
-        set: [expression-after-name, expression-template-comma-or-bracketclose, expression]
+        set: [expression-template-comma-or-bracketclose, expression]
       - match: (?=\S)
-        set: [expression-after-name, expression-template-comma-or-bracketclose, type-expression]
+        set: [expression-template-comma-or-bracketclose, type-expression]
+  expression-symbol-child:
+    - include: comments
+    - match: (?={{ident}})
+      set: value-identifier
+    - match: (?=\[)
+      set: [value-identifier, template-arguments]
+  template-arguments:
+    - include: comments
+    - match: \[
+      scope: meta.function-call.c
+      set:
+      - include: comments
+      - match: \]
+        scope: meta.function-call.c
+        pop: true
+      - include: tpl-arg
+  tpl-arg:
+    - include: comments
+    - match: \#
+      scope: constant.numeric.rl
+      set: [after-tpl-arg, expression]
+    - match: (?=\S)
+      set: [after-tpl-arg, type-expression]
+  after-tpl-arg:
+    - include: comments
+    - match: \,
+      set: tpl-arg
+    - match: \]
+      scope: meta.function-call.c
+      pop: true
   type-expression-template-comma-or-bracketclose:
     - include: comments
     - match: \,
@@ -1103,6 +1133,8 @@ contexts:
     - match: ([\.]|->)
       scope: period.ccpp
       set:
+      - match: (?=\[)
+        set: [expression-after-operand, expression-symbol-child]
       - match: \b(CONSTRUCTOR|DESTRUCTOR)\b
         scope: keyword.rl
         set: expression-after-operand
