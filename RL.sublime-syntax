@@ -1049,7 +1049,7 @@ contexts:
         2: keyword.rl
         3: keyword.rl
         4: keyword.rl
-    - match: (\+[\+:]?|-[-:]?|~:?|!:?|\*|&|\\)
+    - match: (\+[\+:]?|-[-:]?|~:?|!:?|\*|<-|&|\\)
       scope: keyword.operator.rl
       set: expression
     - match: \(
