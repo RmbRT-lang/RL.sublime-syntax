@@ -561,7 +561,7 @@ contexts:
       captures:
         1: constant.numeric.rl
       set: [function-arg-default-init, function-arg-ref, type-expression]
-    - match: (?=\[|{{ident}})
+    - match: (?=\[|{{ident}}|:(?!:))
       set: [function-arg-default-init, function-arg-ref, type-expression]
   function-arg-ref:
     - include: comments
@@ -787,6 +787,14 @@ contexts:
     - include: fn-signature
     - match: (?={{ident}}|\[|::(?!=))
       set: [type-infix-template, type-qualifier, type-expression-symbol]
+    - match: (:(?!:))
+      scope: string.symbolic.rl
+      set:
+        - match: \s+
+          scope: invalid.illegal
+        - match: '{{ident}}'
+          scope: string.symbolic.rl
+          set: [type-infix-template, type-qualifier]
   fn-signature:
     - match: \(
       scope: meta.function-call.rl
@@ -1073,6 +1081,14 @@ contexts:
       set: [expression-after-operand, expression-symbol]
     - match: (?={{ident}})
       set: [expression-after-operand, expression-symbol]
+    - match: (:(?!:))
+      scope: string.symbolic.rl
+      set:
+        - match: \s+
+          scope: invalid.illegal
+        - match: '{{ident}}'
+          scope: string.symbolic.rl
+          set: expression-after-operand
     - match: \S
       scope: invalid.illegal
   expression-close-cast-bracket:
