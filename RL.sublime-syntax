@@ -111,9 +111,6 @@ contexts:
     - match: (?=\S)
       pop: true
   type-identifier:
-    - match: \b(CONSTRUCTOR|DESTRUCTOR)\b
-      scope: keyword.rl
-      pop: true
     - match: \b([A-Z][a-zA-Z0-9]+|[a-z_][a-z0-9_]*_t)\b
       scope: storage.type.name
       pop: true
@@ -126,7 +123,7 @@ contexts:
       scope: storage.type.name
       pop: true
   value-identifier:
-    - match: \b(CONSTRUCTOR|DESTRUCTOR)\b
+    - match: \b(DESTRUCTOR)\b
       scope: keyword.rl
       pop: true
     - match: '\b(FROM)\b'
@@ -138,11 +135,8 @@ contexts:
     - match: '{{uppercase_ident}}(?=\s*::(?!=))'
       scope: storage.type.name.rl
       pop: true
-    - match: '{{lowercase_ident}}(?=\s*\()'
+    - match: '{{ident}}(?=\s*\()'
       scope: meta.function-call.rl
-      pop: true
-    - match: '{{uppercase_ident}}(?=\s*\()'
-      scope: storage.type.name.rl
       pop: true
     - match: '(?<=::){{lowercase_ident}}(?!\s*::(?!=))'
       scope: constant.other.variable.rl
@@ -406,12 +400,25 @@ contexts:
       - include: blockstatement
       - include: semicolon-close-noerr
   constructor:
-    - match: \b(CONSTRUCTOR)\b
-      scope: keyword.rl
-      set:
-      - match: \(
-        scope: meta.function-call.rl
-        set: [constructor-member, function-arguments]
+    - match: \{
+      scope: meta.function-call.c
+      set: [constructor-member, constructor-arguments]
+  constructor-arguments:
+    - include: comments
+    - match: \}
+      scope: meta.function-call.c
+      pop: true
+    - match: (?=\S)
+      set: [constructor-after-arg, function-arg]
+  constructor-after-arg:
+    - include: comments
+    - match: \}
+      scope: meta.function-call.c
+      pop: true
+    - match: \,
+      push: function-arg
+    - match: \S
+      scope: invalid.illegal
   constructor-member:
     - match: \b(INLINE)\b
       scope: keyword.rl
@@ -1099,6 +1106,8 @@ contexts:
           scope: keyword.rl
           set: [expression-close-cast-parenthese, expression]
   expression-close-cast-parenthese:
+    - match: \,
+      push: expression
     - match: \)
       scope: keyword.rl
       set: expression-after-operand
@@ -1149,9 +1158,17 @@ contexts:
     - match: ([\.]|->)
       scope: period.ccpp
       set:
+      - match: \{
+        scope: keyword.rl
+        set:
+          - match: \}
+            scope: keyword.rl
+            set: expression-after-operand
+          - match: (?=\S)
+            set: [ctor-call-after-arg, expression]
       - match: (?=\[)
         set: [expression-after-operand, expression-symbol-child]
-      - match: \b(CONSTRUCTOR|DESTRUCTOR)\b
+      - match: \b(DESTRUCTOR)\b
         scope: keyword.rl
         set: expression-after-operand
       - match: \b([a-zA-Z_][a-zA-Z0-9_]*)\b(?!\s*\()
@@ -1167,6 +1184,12 @@ contexts:
       set: expression-post-operator
     - include: comments
     - include: expression-post-operator
+  ctor-call-after-arg:
+    - match: \,
+      push: expression
+    - match: \}
+      scope: keyword.rl
+      set: expression-after-operand
   expression-post-operator:
     - match: (\+\+|--)
       scope: keyword.operator.rl
