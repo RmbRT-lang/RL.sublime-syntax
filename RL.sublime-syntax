@@ -1068,7 +1068,7 @@ contexts:
       scope: keyword.operator.rl
       set: expression
     - match: \(
-      set: [expression-pop-parenthese, expression]
+      set: [expression-tuple-after-value, expression]
     - match: (?=\[)
       set: [expression-after-operand, expression-symbol]
     - match: \<
@@ -1098,6 +1098,10 @@ contexts:
           set: expression-after-operand
     - match: \S
       scope: invalid.illegal
+  expression-tuple-after-value:
+    - match: \,
+      push: expression
+    - include: expression-pop-parenthese
   expression-close-cast-bracket:
     - match: \>
       scope: keyword.rl
