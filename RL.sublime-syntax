@@ -359,12 +359,69 @@ contexts:
       set:
         - match: \b(STATIC|\#)\b
           scope: invalid.illegal
+        - include: operator-overload
         - include: function-or-possibly-auto-variable
         - include: class-member
     - match: \b(PUBLIC|PROTECTED|PRIVATE)\b
       scope: keyword
       set: class-member-visible
     - include: class-member-visible
+  operator-overload:
+    - match: (\*|--?|\+\+?|~|!|&|\.\.[?!]|@@?|<-)
+      scope: keyword.operator.rl
+      set:
+        - match: \b(THIS)\b
+          scope: keyword
+          set: [function-meta, function-after-head]
+    - match: \b(THIS)\b
+      scope: keyword
+      set:
+        - match: ((\.|->)\*|\+\+|--)
+          scope: keyword.operator.rl
+          set: [function-meta, function-after-head]
+        - match: (\/|<<?<?=?|>>?>?=?|&[\&\=]?|\|[\|=]?|[-+*/%^]=?|[!:=]=|^)
+          scope: keyword.operator.rl
+          set: operator-after-name
+        - include: operator-after-name
+        - match: \[
+          scope: keyword.operator.rl
+          set: [function-meta, function-after-head, subscript-args]
+        - match: \?
+          scope: keyword.operator.rl
+          set:
+            - match: \(
+              scope: meta.function-call.c
+              set: [function-meta, cond-operator-colon, cond-operator-after-arg, function-arg]
+  cond-operator-colon:
+    - match: ':'
+      scope: keyword.operator.rl
+      set:
+        - match: \(
+          scope: meta.function-call.c
+          set: [function-after-head, cond-operator-after-arg, function-arg]
+  cond-operator-after-arg:
+    - match: \)
+      scope: meta.function-call.c
+      pop: true
+  operator-after-name:
+    - match: \(
+      scope: meta.function-call.c
+      set: [function-meta, function-after-head, function-arguments]
+  subscript-args:
+    - match: \]
+      scope: keyword.operator.rl
+      pop: true
+    - match: (?=\S)
+      set: [subscript-after-arg, function-arg]
+  subscript-after-arg:
+    - include: comments
+    - match: \]
+      scope: keyword.operator.rl
+      pop: true
+    - match: \,
+      push: function-arg
+    - match: \S
+      scope: invalid.illegal
   class-member-visible:
     - match: \b(STATIC)\b|#
       scope: keyword
@@ -386,6 +443,7 @@ contexts:
     - include: member-templatedecl
     - include: constructor
     - include: destructor
+    - include: operator-overload
     - include: member-function-or-variable
     - include: class
   destructor:
