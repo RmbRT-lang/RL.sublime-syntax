@@ -1166,7 +1166,12 @@ contexts:
       set:
         - match: \(
           scope: keyword.rl
-          set: [expression-close-cast-parenthese, expression]
+          set:
+            - match: \)
+              scope: keyword.rl
+              set: expression-after-operand
+            - match: (?=\S)
+              set: [expression-close-cast-parenthese, expression]
   expression-close-cast-parenthese:
     - match: \,
       push: expression
