@@ -671,6 +671,10 @@ contexts:
       - match: \@
         scope: invalid.illegal
       - include: function-after-head
+    - match: \#\s*\$?|\$\s*\#?
+      scope: keyword
+    - match: \&\&?
+      scope: storage.modifier.rl
     - match: '::='
       scope: keyword.operator.rl
       set:
