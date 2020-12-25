@@ -398,7 +398,7 @@ contexts:
   cast-operator-after-type:
     - match: \>
       scope: keyword
-      set: function-after-head
+      set: function-after-head-cast
   cond-operator-colon:
     - match: ':'
       scope: keyword.operator.rl
@@ -671,7 +671,7 @@ contexts:
       - match: \@
         scope: invalid.illegal
       - include: function-after-head
-    - match: ':?:='
+    - match: '::='
       scope: keyword.operator.rl
       set:
       - match: \b(INLINE)\b
@@ -686,7 +686,46 @@ contexts:
     - match: \b(INLINE)\b
       scope: keyword.rl
       set:
-      - match: ':?:='
+      - match: '::='
+        scope: keyword.operator.rl
+        set: expression-stmt
+      - match: \?
+        scope: keyword
+        set: blockstatement
+      - match: (?=\S)
+        set: [function-5, type-expression]
+      - match: \S
+        scope: invalid.illegal
+    - match: \?
+      scope: keyword
+      set: blockstatement
+    - match: (?=\S)
+      set: [function-5, type-expression]
+    - match: \S
+      scope: invalid.illegal
+  function-after-head-cast:
+    - match: \@
+      scope: keyword.rl
+      set:
+      - match: \@
+        scope: invalid.illegal
+      - include: function-after-head
+    - match: ':='
+      scope: keyword.operator.rl
+      set:
+      - match: \b(INLINE)\b
+        scope: keyword.rl
+        set:
+        - include: comments
+        - include: expression-stmt
+        - match: \S
+          scope: invalid.illegal
+      - include: comments
+      - include: expression-stmt
+    - match: \b(INLINE)\b
+      scope: keyword.rl
+      set:
+      - match: ':='
         scope: keyword.operator.rl
         set: expression-stmt
       - include: blockstatement
@@ -853,6 +892,9 @@ contexts:
       set:
       - match: \(
         set: [type-infix-template, type-qualifier, parenthese-close-pop, expression]
+    - match: \{
+      scope: keyword
+      set: [tuple-type-after-first, function-arg-ref, type-expression]
     - match: \b(VOID)\b
       scope: keyword.rl
       set: [type-infix-template, type-qualifier]
@@ -867,6 +909,14 @@ contexts:
         - match: '{{ident}}'
           scope: string.symbolic.rl
           set: [type-infix-template, type-qualifier]
+  tuple-type-after-first:
+    - match: \,
+      set: [tuple-type-after-n, function-arg-ref, type-expression]
+  tuple-type-after-n:
+    - match: \}
+      scope: keyword
+      set: type-infix-template
+    - include: tuple-type-after-first
   fn-signature:
     - match: \(
       scope: meta.function-call.rl
