@@ -367,6 +367,9 @@ contexts:
       set: class-member-visible
     - include: class-member-visible
   operator-overload:
+    - match: \<
+      scope: keyword
+      set: [function-meta, cast-operator-after-type, function-arg-ref, type-expression]
     - match: (\*|--?|\+\+?|~|!|&|\.\.[?!]|@@?|<-)
       scope: keyword.operator.rl
       set:
@@ -392,6 +395,10 @@ contexts:
             - match: \(
               scope: meta.function-call.c
               set: [function-meta, cond-operator-colon, cond-operator-after-arg, function-arg]
+  cast-operator-after-type:
+    - match: \>
+      scope: keyword
+      set: function-after-head
   cond-operator-colon:
     - match: ':'
       scope: keyword.operator.rl
