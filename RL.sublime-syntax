@@ -1292,6 +1292,15 @@ contexts:
             set: [ctor-call-after-arg, expression]
       - match: (?=\[)
         set: [expression-after-operand, expression-symbol-child]
+      - match: \(
+        scope: keyword period.ccpp
+        set:
+          - match: \d+
+            scope: variable.other.readwrite.member.rl
+            set:
+              - match: \)
+                scope: keyword period.ccpp
+                set: expression-after-operand
       - match: \b(DESTRUCTOR)\b
         scope: keyword.rl
         set: expression-after-operand
