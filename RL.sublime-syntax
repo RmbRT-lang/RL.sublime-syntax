@@ -71,23 +71,27 @@ contexts:
   templatedecl-inner-pre:
     - match: \]
       scope: keyword.operator.rl
-      set: after_template_decl
-    - match: (?=\S)
-      set: templatedecl-inner
+      pop: true
+    - include: templatedecl-inner
   templatedecl-inner:
-      - match: \]
-        scope: invalid.illegal
-        set: after_template_decl
-      - match: \b\w+\b
+      - match: \b{{ident}}\b
+        scope: string.template.rl
         set:
-        - match: ':'
-          scope: keyword.operator.rl
-          set:
-          - match: \b(TYPE|NUMBER)\b
-            scope: keyword.control.rl
-            set: templatedecl-close-or-comma
-          - match: (?=\S)
-            set: [templatedecl-close-or-comma, type-expression]
+        - match: \.{3}
+          scope: keyword.rl
+          set: templatedecl-inner-after-name
+        - include: templatedecl-inner-after-name
+      - match: \S
+        scope: invalid.illegal
+  templatedecl-inner-after-name:
+      - match: ':'
+        scope: keyword.operator.rl
+        set:
+        - match: \b(TYPE|NUMBER)\b
+          scope: keyword.control.rl
+          set: templatedecl-close-or-comma
+        - match: (?=\S)
+          set: [templatedecl-close-or-comma, type-expression]
       - match: \S
         scope: invalid.illegal
   templatedecl-close-or-comma:
@@ -369,7 +373,7 @@ contexts:
   operator-overload:
     - match: \<
       scope: keyword
-      set: [function-meta, cast-operator-after-type, function-arg-ref, type-expression]
+      set: [function-meta, cast-operator-after-type, type-expression]
     - match: (\*|--?|\+\+?|~|!|&|\.\.[?!]|@@?|<-)
       scope: keyword.operator.rl
       set:
@@ -632,16 +636,9 @@ contexts:
     - match: '({{ident}})\s*:(?!:)'
       captures:
         1: constant.numeric.rl
-      set: [function-arg-default-init, function-arg-ref, type-expression]
+      set: [function-arg-default-init, type-expression]
     - match: (?=\[|{{ident}}|:(?!:))
-      set: [function-arg-default-init, function-arg-ref, type-expression]
-  function-arg-ref:
-    - include: comments
-    - match: \&\&?
-      scope: storage.modifier.rl
-      pop: true
-    - match: (?=\S)
-      pop: true
+      set: [function-arg-default-init, type-expression]
   function-arg-default-init:
     - include: comments
     - match: :=
@@ -678,18 +675,15 @@ contexts:
     - match: '::='
       scope: keyword.operator.rl
       set:
-      - match: \b(INLINE)\b
-        scope: keyword.rl
-        set:
-        - include: comments
-        - include: expression-stmt
-        - match: \S
-          scope: invalid.illegal
       - include: comments
       - include: expression-stmt
     - match: \b(INLINE)\b
       scope: keyword.rl
       set:
+      - match: \#\s*\$?|\$\s*\#?
+        scope: keyword
+      - match: \&\&?
+        scope: storage.modifier.rl
       - match: '::='
         scope: keyword.operator.rl
         set: expression-stmt
@@ -895,16 +889,16 @@ contexts:
       scope: keyword.rl
       set:
       - match: \(
-        set: [type-infix-template, type-qualifier, parenthese-close-pop, expression]
+        set: [type-qualifier, parenthese-close-pop, expression]
     - match: \{
       scope: keyword
-      set: [tuple-type-after-first, function-arg-ref, type-expression]
+      set: [tuple-type-after-first, type-expression]
     - match: \b(VOID)\b
       scope: keyword.rl
-      set: [type-infix-template, type-qualifier]
+      set: type-qualifier
     - include: fn-signature
     - match: (?={{ident}}|\[|::(?!=))
-      set: [type-infix-template, type-qualifier, type-expression-symbol]
+      set: type-expression-symbol
     - match: (:(?!:))
       scope: string.symbolic.rl
       set:
@@ -912,14 +906,14 @@ contexts:
           scope: invalid.illegal
         - match: '{{ident}}'
           scope: string.symbolic.rl
-          set: [type-infix-template, type-qualifier]
+          set: type-qualifier
   tuple-type-after-first:
     - match: \,
-      set: [tuple-type-after-n, function-arg-ref, type-expression]
+      set: [tuple-type-after-n, type-expression]
   tuple-type-after-n:
     - match: \}
       scope: keyword
-      set: type-infix-template
+      set: type-qualifier
     - include: tuple-type-after-first
   fn-signature:
     - match: \(
@@ -936,7 +930,7 @@ contexts:
           - match: (?=\S)
             set: [fn-signature-end, type-expression]
         - match: (?=\S)
-          set: [type-infix-template, type-qualifier, fn-signature-after-arg, type-expression]
+          set: [fn-signature-after-arg, type-expression]
       - match: \S
         scope: invalid
   type-expression-symbol:
@@ -966,7 +960,7 @@ contexts:
         scope: constant.numeric.rl
         set: [type-expression-template-comma-or-bracketclose, expression]
       - match: (?=\S)
-        set: [type-expression-template-comma-or-bracketclose, function-arg-ref, type-expression]
+        set: [type-expression-template-comma-or-bracketclose, type-expression]
   expression-symbol:
     - include: comments
     - match: (?={{ident}})
@@ -1023,7 +1017,7 @@ contexts:
       - match: \#
         set: [type-expression-template-comma-or-bracketclose, expression]
       - match: (?=\S)
-        set: [type-expression-template-comma-or-bracketclose, function-arg-ref, type-expression]
+        set: [type-expression-template-comma-or-bracketclose, type-expression]
     - match: \]
       scope: meta.function-call.c
       set: [type-expression-after-name, type-identifier]
@@ -1052,8 +1046,7 @@ contexts:
     - match: '::'
       scope: meta.function-call.rl
       set: type-expression-symbol
-    - match: (?=\S)
-      pop: true
+    - include: type-qualifier
   expression-after-name:
     - include: comments
     - match: '::'
@@ -1069,7 +1062,7 @@ contexts:
       set:
       - match: \@|\&
         scope: keyword.rl
-        set: [fn-signature-end, type-expression]
+        set: [fn-signature-end,  type-expression]
       - match: (?=\S)
         set: [fn-signature-end, type-expression]
     - match: \S
@@ -1077,75 +1070,66 @@ contexts:
   fn-signature-end:
     - match: \)
       scope: meta.function-call.rl
-      set: type-indirection
+      set: type-qualifier-step-indirection
     - match: \S
       scope: invalid.illegal
+  type-qualifier:
+    - include: comments
+    - include: type-qualifier-step-nodecay
+  type-qualifier-step-nodecay:
+    - match: \!
+      scope: keyword.rl
+      set: type-qualifier-step-qualifier
+    - include: type-qualifier-step-qualifier
+  type-qualifier-step-qualifier:
+    - match: \#
+      scope: storage.modifier.qualifier.rl
+      set:
+        - match: \$
+          scope: storage.modifier.qualifier.rl
+          set: type-qualifier-step-indirection
+        - include: type-qualifier-step-indirection
+    - match: \$
+      scope: storage.modifier.qualifier.rl
+      set:
+        - match: \#
+          scope: storage.modifier.qualifier.rl
+          set: type-qualifier-step-indirection
+        - include: type-qualifier-step-indirection
+    - include: type-qualifier-step-indirection
+  type-qualifier-step-indirection:
+    - match: \*|\\|@|\.{2}[!?]
+      scope: storage.modifier.indirection.rl
+      set: type-qualifier
+    - match: \[
+      set:
+        - include: type-qualifier-array-close
+        - match: (?=\S)
+          set: [type-qualifier-array-after-dimension, expression]
+    - include: type-reference
+  type-qualifier-array-after-dimension:
+    - match: \,
+      set: [type-qualifier-array-after-dimension, expression]
+    - include: type-qualifier-array-close
+  type-qualifier-array-close:
+    - match: \]
+      set: type-qualifier-step-indirection
+  type-reference:
+    - match: (&&?)
+      scope: storage.modifier.rl
+      set: type-variadic-expand
+    - include: type-variadic-expand
+  type-variadic-expand:
+    - match: \.{3}
+      scope: keyword.rl
+      pop: true
+    - include: type-infix-template
   type-infix-template:
     - match: (\-)
       scope: constant.numeric.rl
-      set: [type-infix-template, type-qualifier, type-expression-symbol]
+      set: type-expression-symbol
     - match: (?=\S)
       pop: true
-  type-qualifier:
-    - include: comments
-    - match: \!
-      scope: keyword.rl
-      set:
-        - match: \!
-          scope: invalid.illegal
-        - include: type-qualifier
-    - match: (#)
-      scope: storage.modifier.qualifier.rl
-      set:
-      - include: comments
-      - match: (\$)
-        scope: storage.modifier.qualifier.rl
-        set:
-          - include: type-indirection
-          - include: type-array
-          - match: (?=\S)
-            pop: true
-      - include: type-indirection
-      - include: type-array
-      - match: (?=\S)
-        pop: true
-    - match: (\$)
-      scope: storage.modifier.qualifier.rl
-      set:
-      - include: comments
-      - match: (#)
-        scope: storage.modifier.qualifier.rl
-        set:
-          - include: type-indirection
-          - include: type-array
-          - match: (?=\S)
-            pop: true
-      - include: type-indirection
-      - match: (?=\S)
-        pop: true
-    - include: type-indirection
-    - include: type-array
-    - match: (?=\S)
-      pop: true
-  type-indirection:
-    - include: comments
-    - match: (\*|\\|@|\.{2}[!?])
-      scope: storage.modifier.indirection.rl
-      set: type-qualifier
-  type-array:
-    - include: comments
-    - match: \[
-      set:
-        - include: type-array-close
-        - match: (?=\S)
-          set: [type-array-close, expression]
-  type-array-close:
-    - match: \]
-      set:
-        - include: type-indirection
-        - include: type-array
-        - match: (?=\S)
-          pop: true
   expression:
     - include: comments
     - include: string
@@ -1192,7 +1176,7 @@ contexts:
       set: [expression-after-operand, expression-symbol]
     - match: \<
       scope: keyword.rl
-      set: [expression-close-cast-bracket, function-arg-ref, type-expression]
+      set: [expression-close-cast-bracket, type-expression]
     - match: \b(0([xX][0-9a-fA-F]+.[0-9a-fA-F]*|[0-7]+\.[0-7]*)|(0|[1-9][0-9]*)\.[0-9]*)['_][hsdqHSDQ]\b
       scope: constant.numeric.rl
       set: expression-after-operand
@@ -1280,6 +1264,8 @@ contexts:
             0: punctuation.definition.string.end.rl
           set: expression-after-operand
   expression-after-operand:
+    - match: \.{3}
+      scope: keyword
     - match: ([\.]|->)\*
       scope: keyword.operator.rl
       set: expression
