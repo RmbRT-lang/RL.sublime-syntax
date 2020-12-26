@@ -1137,7 +1137,7 @@ contexts:
     - match: \b(TRUE|FALSE|NULL)\b
       scope: constant.language.rl
       set: expression-after-operand
-    - match: \b(SIZEOF)\b
+    - match: \b(SIZEOF)(...)?\b
       scope: keyword.rl
       set:
         - match: \(
