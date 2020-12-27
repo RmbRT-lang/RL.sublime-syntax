@@ -791,7 +791,12 @@ contexts:
     - match: '({{ident}})\s*(:)(?![:=])'
       captures:
         1: constant.numeric.rl
-      set: [semicolon-close, variable-initialiser, type-expression]
+      set:
+        - match: \?
+          scope: keyword
+          set: [semicolon-close, variable-initialiser, type-qualifier]
+        - match: (?=\S)
+          set: [semicolon-close, variable-initialiser, type-expression]
     - match: '{{ident}}(?=\s*(#|\$|::=))'
       scope: constant.numeric.rl
       set: [auto-variable]
