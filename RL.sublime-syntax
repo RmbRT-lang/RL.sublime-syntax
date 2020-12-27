@@ -637,7 +637,7 @@ contexts:
       captures:
         1: constant.numeric.rl
       set: [function-arg-default-init, type-expression]
-    - match: (?=\[|{{ident}}|:(?!:))
+    - match: (?=\[|{{ident}}|:(?!:)|\{)
       set: [function-arg-default-init, type-expression]
   function-arg-default-init:
     - include: comments
