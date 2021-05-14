@@ -371,15 +371,15 @@ contexts:
       set: class-member-visible
     - include: class-member-visible
   operator-overload:
-    - match: \<
-      scope: keyword
-      set: [function-meta, cast-operator-after-type, type-expression]
     - match: (\*|--?|\+\+?|~|!|&|\.\.[?!]|@@?|<-)
       scope: keyword.operator.rl
       set:
         - match: \b(THIS)\b
           scope: keyword
           set: [function-meta, function-after-head]
+    - match: \<
+      scope: keyword
+      set: [function-meta, cast-operator-after-type, type-expression]
     - match: \b(THIS)\b
       scope: keyword
       set:
@@ -441,12 +441,11 @@ contexts:
       - include: constructor
       - include: destructor
       - include: function-or-variable
-      - match: \b(VIRTUAL|ABSTRACT|OVERRIDE|FINAL)\b
-        scope: keyword
-        set: function
     - match: \b(VIRTUAL|ABSTRACT|OVERRIDE|FINAL)\b
       scope: keyword
-      set: function
+      set:
+        - include: member-function-or-variable
+        - include: operator-overload
     - include: comments
     - include: enum
     - include: union
@@ -1182,7 +1181,7 @@ contexts:
     - match: \<
       scope: keyword.rl
       set: [expression-close-cast-bracket, type-expression]
-    - match: \b(0([xX][0-9a-fA-F]+.[0-9a-fA-F]*|[0-7]+\.[0-7]*)|(0|[1-9][0-9]*)\.[0-9]*)['_][hsdqHSDQ]\b
+    - match: \b(0([xX][0-9a-fA-F]+\.[0-9a-fA-F]*|[0-7]+\.[0-7]*)|(0|[1-9][0-9]*)\.[0-9]*)(['_][hsdqHSDQ])?\b
       scope: constant.numeric.rl
       set: expression-after-operand
     - match: \b(0([xX][0-9a-fA-F]+|[0-7]+)|0|[1-9][0-9]*)\b
