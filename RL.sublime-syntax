@@ -1178,6 +1178,9 @@ contexts:
       set: [expression-tuple-after-value, expression]
     - match: (?=\[)
       set: [expression-after-operand, expression-symbol]
+    - match: \<\<
+      scope: keyword.rl
+      set: [expression-close-dynamic-cast-bracket, type-expression]
     - match: \<
       scope: keyword.rl
       set: [expression-close-cast-bracket, type-expression]
@@ -1209,6 +1212,17 @@ contexts:
     - match: \,
       push: expression
     - include: expression-pop-parenthese
+  expression-close-dynamic-cast-bracket:
+    - match: \>\>
+      scope: keyword.rl
+      set:
+        - match: \(
+          scope: keyword.rl
+          set: [expression-close-dynamic-cast-parenthese, expression]
+  expression-close-dynamic-cast-parenthese:
+    - match: \)
+      scope: keyword.rl
+      set: expression-after-operand
   expression-close-cast-bracket:
     - match: \>
       scope: keyword.rl
