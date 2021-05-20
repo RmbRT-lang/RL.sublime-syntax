@@ -95,7 +95,7 @@ contexts:
       - match: \S
         scope: invalid.illegal
   templatedecl-close-or-comma:
-    - match: \,
+    - match: \;
       set: templatedecl-inner
     - match: \]
       scope: keyword.operator.rl
@@ -962,9 +962,12 @@ contexts:
         set: [type-expression-after-name, type-identifier]
       - match: \#
         scope: constant.numeric.rl
-        set: [type-expression-template-comma-or-bracketclose, expression]
+        set: [type-expression-template-comma-or-bracketclose, expression-list-commas-after-expression, expression]
+      - match: \;
+        scope: keyword
+        set: type-expression-template-comma-or-bracketclose
       - match: (?=\S)
-        set: [type-expression-template-comma-or-bracketclose, type-expression]
+        set: [type-expression-template-comma-or-bracketclose, type-list-commas-after-type, type-expression]
   expression-symbol:
     - include: comments
     - match: (?={{ident}})
@@ -978,9 +981,12 @@ contexts:
         set: [expression-after-name, value-identifier]
       - match: \#
         scope: constant.numeric.rl
-        set: [expression-template-comma-or-bracketclose, expression]
+        set: [expression-template-comma-or-bracketclose, expression-list-commas-after-expression, expression]
+      - match: \;
+        scope: keyword
+        set: expression-template-comma-or-bracketclose
       - match: (?=\S)
-        set: [expression-template-comma-or-bracketclose, type-expression]
+        set: [expression-template-comma-or-bracketclose, type-list-commas-after-type, type-expression]
   expression-symbol-child:
     - include: comments
     - match: (?={{ident}})
@@ -1013,32 +1019,54 @@ contexts:
       pop: true
   type-expression-template-comma-or-bracketclose:
     - include: comments
-    - match: \,
+    - match: \;
+      scope: keyword
       set:
       - include: comments
       - match: \]
         scope: invalid.illegal
       - match: \#
-        set: [type-expression-template-comma-or-bracketclose, expression]
+        scope: constant.numeric.rl
+        set: [type-expression-template-comma-or-bracketclose, expression-list-commas-after-expression, expression]
+      - match: \;
+        scope: keyword
+        set: type-expression-template-comma-or-bracketclose
       - match: (?=\S)
-        set: [type-expression-template-comma-or-bracketclose, type-expression]
+        set: [type-expression-template-comma-or-bracketclose, type-list-commas-after-type, type-expression]
     - match: \]
       scope: meta.function-call.c
       set: [type-expression-after-name, type-identifier]
     - match: \S+
       scope: invalid.illegal
       pop: true
-  expression-template-comma-or-bracketclose:
+  expression-list-commas-after-expression:
     - include: comments
     - match: \,
+      set: [expression-list-commas-after-expression, expression]
+    - match: (?=\S)
+      pop: true
+  type-list-commas-after-type:
+    - include: comments
+    - match: \,
+      set: [type-list-commas-after-type, type-expression]
+    - match: (?=\S)
+      pop: true
+  expression-template-comma-or-bracketclose:
+    - include: comments
+    - match: \;
+      scope: keyword
       set:
       - include: comments
       - match: \]
         scope: invalid.illegal
       - match: \#
-        set: [expression-template-comma-or-bracketclose, expression]
+        scope: constant.numeric.rl
+        set: [type-expression-template-comma-or-bracketclose, expression-list-commas-after-expression, expression]
+      - match: \;
+        scope: keyword
+        set: type-expression-template-comma-or-bracketclose
       - match: (?=\S)
-        set: [expression-template-comma-or-bracketclose, type-expression]
+        set: [type-expression-template-comma-or-bracketclose, type-list-commas-after-type, type-expression]
     - match: \]
       scope: meta.function-call.c
       set: [expression-after-name, value-identifier]
