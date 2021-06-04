@@ -1336,6 +1336,9 @@ contexts:
     - match: ([\.]|->)
       scope: period.ccpp
       set:
+      - match: \~
+        scope: keyword.rl
+        set: expression-after-operand
       - match: \{
         scope: keyword.rl
         set:
