@@ -121,7 +121,7 @@ contexts:
     - match: \b[A-Z]\b
       pop: true
     - match: '{{ident}}(?=\s*::(?!=))'
-      scope: entity.name.namespace.rl
+      scope: meta.namespace.rl
       pop: true
     - match: '{{ident}}'
       scope: storage.type.name
@@ -134,7 +134,7 @@ contexts:
       scope: keyword.rl
       pop: true
     - match: '{{lowercase_ident}}(?=\s*::(?!=))'
-      scope: entity.name.namespace.rl
+      scope: meta.namespace.rl
       pop: true
     - match: '{{uppercase_ident}}(?=\s*::(?!=))'
       scope: storage.type.name.rl
@@ -170,20 +170,28 @@ contexts:
           scope: string.quoted.double.rl
           set: blockstatement
   namespace:
-    - match: ::(?!=)
+    - match: (?=::)
       scope: keyword.control.rl
-      set:
+      set: namespace_name
+  namespace_name:
+    - meta_scope: entity.name.namespace.rl 
+    - match: "::"
+      scope: keyword
+      push:
       - match: '{{ident}}'
-        scope: entity.name.namespace.rl
-        set:
-        - match: "{"
-          scope: open.curly.bracket.block.rl
-          set:
-          - include: blockclose-no-semicolon
-          - match: (?=\S)
-            push: global
-        - match: (?=\S)
-          set: global
+        scope: meta.namespace.rl
+        pop: true
+    - match: (?=\s*(?!::))
+      set: namespace_after_name
+  namespace_after_name:
+    - match: "{"
+      scope: open.curly.bracket.block.rl
+      set:
+      - include: blockclose-no-semicolon
+      - match: (?=\S)
+        push: global
+    - match: (?=\S)
+      set: global
   enum:
     - match: \b(ENUM)\b
       scope: keyword.rl
@@ -941,11 +949,11 @@ contexts:
     - include: comments
     - include: type-expression-symbol-root
     - match: (::)(?!=)
-      scope: entity.name.namespace.rl
+      scope: meta.namespace.rl
       set: type-expression-symbol-root
   type-expression-symbol-root:
     - match: '{{lowercase_ident}}(?=::)'
-      scope: entity.name.namespace.rl
+      scope: meta.namespace.rl
       set: type-expression-after-name
     - match: '{{uppercase_ident}}(?=::)'
       scope: storage.type.name.rl
@@ -1225,7 +1233,7 @@ contexts:
       scope: variable.language.rl keyword.rl
       set: expression-after-operand
     - match: (::)
-      scope: entity.name.namespace.rl
+      scope: meta.namespace.rl
       set: [expression-after-operand, expression-symbol]
     - match: (?={{ident}})
       set: [expression-after-operand, expression-symbol]
