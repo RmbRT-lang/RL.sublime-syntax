@@ -283,7 +283,7 @@ contexts:
           scope: entity.name.type.rl storage.type.name.rl
           set: class-body
   concept:
-    - match: \b(CONCEPT)\b
+    - match: \b(MASK)\b
       scope: keyword.rl
       set:
         - match: '{{ident}}'
