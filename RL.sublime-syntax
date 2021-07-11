@@ -1505,6 +1505,9 @@ contexts:
     - match: \(
       set: [switch-body, switch-after-expression, variable-or-expression]
   switch-after-expression:
+    - match: \;
+      scope: semi_colon.eol.ccpp
+      set: [parenthese-close-pop, expression]
     - match: \)
       pop: true
   switch-body:
