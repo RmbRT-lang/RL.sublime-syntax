@@ -445,10 +445,11 @@ contexts:
     - match: \b(STATIC)\b|#
       scope: keyword
       set:
-      - include: comments
-      - include: constructor
-      - include: destructor
-      - include: function-or-variable
+        - match: \b(STATIC|\#)\b
+          scope: invalid.illegal
+        - include: operator-overload
+        - include: function-or-possibly-auto-variable
+        - include: class-member-visible
     - match: \b(VIRTUAL|ABSTRACT|OVERRIDE|FINAL)\b
       scope: keyword
       set:
