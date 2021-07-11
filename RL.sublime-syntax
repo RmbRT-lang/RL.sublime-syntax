@@ -1351,6 +1351,17 @@ contexts:
     - match: ([\.]|->)\*
       scope: keyword.operator.rl
       set: expression
+    - match: \b(VISIT)\b
+      scope: keyword.rl
+      set:
+        - match: \(
+          scope: meta.function-call.c
+          set:
+            - match: \)
+              scope: invalid.illegal
+              set: expression-after-operand
+            - match: (?=\S)
+              set: [call-arguments, expression]
     - match: ([\.]|->)
       scope: period.ccpp
       set:
@@ -1376,9 +1387,6 @@ contexts:
               - match: \)
                 scope: keyword period.ccpp
                 set: expression-after-operand
-      - match: \b(DESTRUCTOR)\b
-        scope: keyword.rl
-        set: expression-after-operand
       - match: \b([a-zA-Z_][a-zA-Z0-9_]*)\b(?!\s*\()
         scope: variable.other.readwrite.member.rl
         set: expression-after-operand
