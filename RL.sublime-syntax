@@ -503,6 +503,9 @@ contexts:
       - match: \b(INLINE)\b
         scope: invalid.illegal
       - include: constructor-member
+    - match: '->'
+      scope: keyword
+      set: constructor-base-init
     - match: ':'
       scope: meta.function-call.rl
       set: constructor-member-init
@@ -510,13 +513,14 @@ contexts:
     - match: \;
       scope: semi_colon.eol.ccpp
       pop: true
+  constructor-base-init:
+    - match: (?=\S)
+      set: [constructor-base-init-after, constructor-init-after-name, type-expression-symbol]
   constructor-member-init:
     - match: '{{ident}}(?=\s*\()'
       scope: variable.other.readwrite.member.c++
-      set: constructor-member-init-after-symbol
-    - match: (?=\S)
-      set: [constructor-member-init-after-symbol, type-expression-symbol]
-  constructor-member-init-after-symbol:
+      set: [constructor-member-init-after, constructor-init-after-name]
+  constructor-init-after-name:
     - match: \(
       scope: meta.function-call.rl
       set:
@@ -525,10 +529,23 @@ contexts:
         set:
         - match: \)
           scope: meta.function-call.rl
-          set: constructor-after-member-init
+          pop: true
       - match: (?=\S)
-        set: [constructor-after-member-init, arg-or-close]
-  constructor-after-member-init:
+        set: arg-or-close
+  constructor-base-init-after:
+    - include: blockstatement
+    - match: \,
+      set: constructor-base-init
+    - match: ;
+      scope: semi_colon.eol.ccpp
+      pop: true
+    - match: ':'
+      scope: meta.function-call.rl
+      set: constructor-member-init
+    - match: \S+
+      scope: invalid.illegal.rl
+      pop: true
+  constructor-member-init-after:
     - include: blockstatement
     - match: \,
       set: constructor-member-init
