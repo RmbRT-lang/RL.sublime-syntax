@@ -905,7 +905,7 @@ contexts:
     - match: \{
       scope: keyword
       set: [tuple-type-after-first, type-expression]
-    - match: \b(VOID)\b
+    - match: \b(VOID|U?(INT|CHAR)|BOOL|[US][1248]|SINGLE|DOUBLE)\b
       scope: keyword.rl
       set: type-qualifier
     - include: fn-signature
