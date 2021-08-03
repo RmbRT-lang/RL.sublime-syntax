@@ -127,19 +127,13 @@ contexts:
       scope: storage.type.name
       pop: true
   value-identifier:
-    - match: \b(DESTRUCTOR)\b
-      scope: keyword.rl
-      pop: true
-    - match: '\b(FROM)\b'
-      scope: keyword.rl
-      pop: true
     - match: '{{lowercase_ident}}(?=\s*::(?!=))'
       scope: meta.namespace.rl
       pop: true
     - match: '{{uppercase_ident}}(?=\s*::(?!=))'
       scope: storage.type.name.rl
       pop: true
-    - match: '{{ident}}(?=\s*\()'
+    - match: '{{ident}}(?=\s*(\(|\bVISIT\b))'
       scope: meta.function-call.rl
       pop: true
     - match: '(?<=::){{lowercase_ident}}(?!\s*::(?!=))'
@@ -1351,6 +1345,17 @@ contexts:
     - match: ([\.]|->)\*
       scope: keyword.operator.rl
       set: expression
+    - match: \b(VISIT)\b
+      scope: keyword.rl
+      set:
+        - match: \(
+          scope: meta.function-call.c
+          set:
+            - match: \)
+              scope: invalid.illegal
+              set: expression-after-operand
+            - match: (?=\S)
+              set: [call-arguments, expression]
     - match: ([\.]|->)
       scope: period.ccpp
       set:
@@ -1376,13 +1381,10 @@ contexts:
               - match: \)
                 scope: keyword period.ccpp
                 set: expression-after-operand
-      - match: \b(DESTRUCTOR)\b
-        scope: keyword.rl
-        set: expression-after-operand
-      - match: \b([a-zA-Z_][a-zA-Z0-9_]*)\b(?!\s*\()
+      - match: \b([a-zA-Z_][a-zA-Z0-9_]*)\b(?!\s*(\(|\bVISIT\b))
         scope: variable.other.readwrite.member.rl
         set: expression-after-operand
-      - match: \b([a-zA-Z_][a-zA-Z0-9_]*)\b(?=\s*\()
+      - match: \b([a-zA-Z_][a-zA-Z0-9_]*)\b(?=\s*(\(|\bVISIT\b))
         scope: meta.function-call.c
         set: expression-after-operand
       - match: \S
