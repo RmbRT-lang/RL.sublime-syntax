@@ -379,6 +379,9 @@ contexts:
         - match: \b(THIS)\b
           scope: keyword
           set: [function-meta, function-after-head]
+    - match: \<<<
+      scope: keyword
+      set: [function-meta, function-after-head, factory-arguments]
     - match: \<
       scope: keyword
       set: [function-meta, cast-operator-after-type, type-expression]
@@ -634,6 +637,22 @@ contexts:
     - meta_scope: meta.function.rl
     - match: ""
       pop: true
+  factory-arguments:
+    - include: comments
+    - match: \>\>\>
+      scope: keyword
+      pop: true
+    - match: (?=\S)
+      set: [factory-after-arg, function-arg]
+  factory-after-arg:
+    - include: comments
+    - match: \>\>\>
+      scope: keyword
+      pop: true
+    - match: \,
+      push: function-arg
+    - match: \S
+      scope: invlaid.illegal
   function-arguments:
     - include: comments
     - match: \)
