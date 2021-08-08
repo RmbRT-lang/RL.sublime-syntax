@@ -1473,6 +1473,7 @@ contexts:
     - include: blockstatement
     - include: if
     - include: throw
+    - include: type-switch
     - include: switch
     - include: while
     - include: do-loop
@@ -1535,6 +1536,42 @@ contexts:
       set: [statement, control-label]
     - match: (?=\S)
       pop: true
+  type-switch:
+    - match: \b(TYPE)\b
+      scope: keyword
+      set:
+        - match: \b(SWITCH)\b
+          scope: keyword.control.rl
+          set:
+            - match: \b(STATIC)\b
+              scope: keyword
+              set: type-switch-value
+            - include: type-switch-value
+  type-switch-value:
+    - match: \(
+      set: [type-switch-after-value, expression]
+  type-switch-after-value:
+    - match: \)
+      set:
+        - match: \{
+          scope: open.curly.bracket.block.rl
+          set: type-case
+  type-case:
+    - match: \b(CASE)\b
+      scope: keyword.control.rl
+      set: [type-case-after-value, type-expression]
+    - match: \b(DEFAULT)\b
+      scope: keyword.control.rl
+      set: type-case-after-value
+    - match: \S
+      scope: invalid.illegal.rl
+      pop: true
+  type-case-after-value:
+    - match: ':'
+      set: [after-type-case, statement]
+  after-type-case:
+    - include: blockclose
+    - include: type-case
   switch:
     - match: \b(SWITCH)\b
       scope: keyword.control.rl
