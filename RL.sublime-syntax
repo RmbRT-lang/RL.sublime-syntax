@@ -1208,6 +1208,23 @@ contexts:
     - match: \b(TRUE|FALSE|NULL)\b
       scope: constant.language.rl
       set: expression-after-operand
+    - match: \b(TYPE)\b
+      scope: keyword
+      set:
+        - match: \b(TYPE)\b
+          scope: keyword
+          set:
+            - match: \(
+              set: [expression-pop-parenthese, type-expression]
+        - match: \b(STATIC)\b
+          scope: keyword
+          set:
+            - match: \(
+              set: [expression-pop-parenthese, expression]
+        - match: \(
+          set: [expression-pop-parenthese, expression]
+        - match: \S
+          scope: invalid.illegal
     - match: \b(SIZEOF)(...)?\b
       scope: keyword.rl
       set:
