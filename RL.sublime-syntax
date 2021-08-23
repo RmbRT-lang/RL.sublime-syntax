@@ -1584,6 +1584,8 @@ contexts:
       scope: invalid.illegal.rl
       pop: true
   type-case-after-value:
+    - match: \,
+      push: type-expression
     - match: ':'
       set: [after-type-case, statement]
   after-type-case:
