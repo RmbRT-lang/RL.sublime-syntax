@@ -388,7 +388,7 @@ contexts:
     - match: \b(THIS)\b
       scope: keyword
       set:
-        - match: ((\.|->)\*|\+\+|--)
+        - match: ((\.|->)\*|\+\+|--|!(?!=))
           scope: keyword.operator.rl
           set: [function-meta, function-after-head]
         - match: (\/|<<?<?=?|>>?>?=?|&[\&\=]?|\|[\|=]?|[-+*/%^]=?|[!:=]=|^)
