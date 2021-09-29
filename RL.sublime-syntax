@@ -1488,6 +1488,7 @@ contexts:
   statement:
     - include: comments
     - include: blockstatement
+    - include: wait-or-sleep
     - include: if
     - include: throw
     - include: type-switch
@@ -1522,6 +1523,13 @@ contexts:
         pop: true
       - match: (?=\S)
         push: statement
+  wait-or-sleep:
+    - match: \.{3}
+      scope: keyword
+      set:
+        - include: semicolon-close
+        - match: (?=\S)
+          set: [semicolon-close, expression]
   expression-stmt:
     - match: (?=\S)
       set: [semicolon-close, expression]
