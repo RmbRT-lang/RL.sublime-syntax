@@ -1169,7 +1169,7 @@ contexts:
         - include: type-qualifier-step-indirection
     - include: type-qualifier-step-indirection
   type-qualifier-step-indirection:
-    - match: \*|\\|@|\.{2}[!?]
+    - match: ([*\\@^]|\.{2}[!?])
       scope: storage.modifier.indirection.rl
       set: type-qualifier
     - match: \[
@@ -1241,10 +1241,10 @@ contexts:
         - match: \.{2}[!?]
           scope: invalid.illegal
         - include: expression
-    - match: \@@?
+    - match: \@@?|\^
       scope: keyword.control.rl
       set:
-        - match: \@@?
+        - match: \@@?|\^
           scope: invalid.illegal
         - match: \.{2}[!?]
           scope: invalid.illegal
