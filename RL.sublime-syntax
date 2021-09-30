@@ -621,6 +621,13 @@ contexts:
         2: keyword.rl
         3: keyword.rl
         4: keyword.rl
+      set:
+        - match: \.
+          scope: keyword.rl
+          set: auto-variable-init
+        - include: auto-variable-init
+    - match: \.
+      scope: keyword.rl
       set: auto-variable-init
     - include: auto-variable-init
   auto-variable-init:
@@ -1164,15 +1171,24 @@ contexts:
       set:
         - match: \$
           scope: storage.modifier.qualifier.rl
-          set: type-qualifier-step-indirection
-        - include: type-qualifier-step-indirection
+          set: type-qualifier-step-atomic
+        - include: type-qualifier-step-atomic
     - match: \$
       scope: storage.modifier.qualifier.rl
       set:
         - match: \#
           scope: storage.modifier.qualifier.rl
+          set: type-qualifier-step-atomic
+        - include: type-qualifier-step-atomic
+    - include: type-qualifier-step-atomic
+  type-qualifier-step-atomic:
+    - match: \.
+      scope: keyword.rl
+      set:
+        - match: \.
+          scope: invalid.illegal.rl
+        - match: (?=\S)
           set: type-qualifier-step-indirection
-        - include: type-qualifier-step-indirection
     - include: type-qualifier-step-indirection
   type-qualifier-step-indirection:
     - match: ([*\\@^]|\.{2}[!?])
