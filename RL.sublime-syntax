@@ -942,11 +942,17 @@ contexts:
     - include: fn-signature
     - match: (?={{ident}}|\[|::(?!=))
       set: type-expression-symbol
+    - match: :\.
+      scope: keyword.constant.rl
+      set: type-qualifier
     - match: (:(?!:))
       scope: string.symbolic.rl
       set:
         - match: \s+
           scope: invalid.illegal
+        - match: (<[->]|[<>?!])
+          scope: string.symbolic.rl
+          set: type-qualifier
         - match: '{{ident}}'
           scope: string.symbolic.rl
           set: type-qualifier
@@ -1290,6 +1296,9 @@ contexts:
       set:
         - match: \s+
           scope: invalid.illegal
+        - match: (<[->]|[<>!?])
+          scope: string.symbolic.rl
+          set: expression-after-operand
         - match: '{{ident}}'
           scope: string.symbolic.rl
           set: expression-after-operand
