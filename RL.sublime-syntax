@@ -1607,15 +1607,11 @@ contexts:
           scope: open.curly.bracket.block.rl
           set: type-case
   type-case:
-    - match: \b(CASE)\b
-      scope: keyword.control.rl
-      set: [type-case-after-value, type-expression]
     - match: \b(DEFAULT)\b
       scope: keyword.control.rl
       set: type-case-after-value
-    - match: \S
-      scope: invalid.illegal.rl
-      pop: true
+    - match: (?=\S)
+      set: [type-case-after-value, type-expression]
   type-case-after-value:
     - match: \,
       push: type-expression
@@ -1642,15 +1638,11 @@ contexts:
       scope: open.curly.bracket.block.rl
       set: case
   case:
-    - match: \b(CASE)\b
-      scope: keyword.control.rl
-      set: [case-after-value, expression, control-label]
     - match: \b(DEFAULT)\b
       scope: keyword.control.rl
       set: [case-end, control-label]
-    - match: \S
-      scope: invalid.illegal.rl
-      pop: true
+    - match: (?=\S)
+      set: [case-after-value, expression, control-label]
   case-after-value:
     - match: \,
       push: expression
