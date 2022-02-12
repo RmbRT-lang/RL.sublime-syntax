@@ -1769,6 +1769,9 @@ contexts:
     - match: \)
       pop: true
   return:
+    - match: =(?!=)
+      scope: keyword.control.rl
+      set: [semicolon-close, expression]
     - match: \b(RETURN)\b
       scope: keyword.control.rl
       set:
