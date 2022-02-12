@@ -1223,10 +1223,14 @@ contexts:
       set: type-expression-symbol
     - match: (?=\S)
       pop: true
+  expression-or-ambiguous-statement-expression:
+    - include: ambiguous-statement-expression
+    - include: expression
   expression:
     - include: comments
     - include: string
     - include: char
+    - include: unambiguous-statement-expression
     - match: \b(TRUE|FALSE|NULL)\b
       scope: constant.language.rl
       set: expression-after-operand
@@ -1281,7 +1285,7 @@ contexts:
         3: keyword.rl
         4: keyword.rl
     - match: \(
-      set: [expression-tuple-after-value, expression]
+      set: [expression-tuple-after-value, expression-or-ambiguous-statement-expression]
     - match: (?=\[)
       set: [expression-after-operand, expression-symbol]
     - match: \<<<
@@ -1530,6 +1534,18 @@ contexts:
     - include: variable-or-expression-stmt
     - match: \S
       scope: invalid.illegal
+  unambiguous-statement-expression:
+      - include: comments
+      - include: blockstatement
+      - include: type-switch
+      - include: switch
+      - include: do-loop
+  ambiguous-statement-expression:
+      - include: comments
+      - include: if
+      - include: while
+      - include: for
+      - include: try
   blockstatement:
     - match: '{'
       scope: open.curly.bracket.block.rl
@@ -1587,16 +1603,13 @@ contexts:
     - match: (?=\S)
       pop: true
   type-switch:
-    - match: \b(TYPE)\b
-      scope: keyword
+    - match: \b(TYPE\s+SWITCH)\b
+      scope: keyword.control.rl
       set:
-        - match: \b(SWITCH)\b
-          scope: keyword.control.rl
-          set:
-            - match: \b(STATIC)\b
-              scope: keyword
-              set: type-switch-value
-            - include: type-switch-value
+        - match: \b(STATIC)\b
+          scope: keyword
+          set: type-switch-value
+        - include: type-switch-value
   type-switch-value:
     - match: \(
       set: [type-switch-after-value, expression]
