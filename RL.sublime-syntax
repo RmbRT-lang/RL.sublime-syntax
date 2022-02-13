@@ -473,12 +473,42 @@ contexts:
           - include: semicolon-close-noerr
       - include: blockstatement
       - include: semicolon-close-noerr
+  symbol-constant:
+    - match: (:(?!:))
+      scope: string.symbolic.rl
+      set:
+        - match: \s+
+          scope: invalid.illegal
+        - match: (<[->]|[<>?!])
+          scope: string.symbolic.rl
+          pop: true
+        - match: '{{ident}}'
+          scope: string.symbolic.rl
+          pop: true
+        - match: \S+
+          scope: invalid.illegal
   constructor:
+    - include: constructor-open
+    - match: (?=:)
+      set: [constructor-open, symbol-constant]
+  constructor-open:
     - match: \{
       scope: meta.function-call.c
       set: [constructor-member, constructor-arguments]
   constructor-arguments:
     - include: comments
+    - match: (#\s*&|&&)
+      scope: keyword
+      set:
+        - match: '{{ident}}'
+          scope: constant.numeric.rl
+          set:
+            - match: \}
+              scope: meta.function-call.c
+              pop: true
+        - match: \}
+          scope: meta.function-call.c
+          pop: true
     - match: \}
       scope: meta.function-call.c
       pop: true
@@ -952,17 +982,8 @@ contexts:
     - match: :\.
       scope: keyword.constant.rl
       set: type-qualifier
-    - match: (:(?!:))
-      scope: string.symbolic.rl
-      set:
-        - match: \s+
-          scope: invalid.illegal
-        - match: (<[->]|[<>?!])
-          scope: string.symbolic.rl
-          set: type-qualifier
-        - match: '{{ident}}'
-          scope: string.symbolic.rl
-          set: type-qualifier
+    - match: (?=:(?!:))
+      set: [type-qualifier, symbol-constant]
   tuple-type-after-first:
     - match: \,
       set: [tuple-type-after-n, type-expression]
