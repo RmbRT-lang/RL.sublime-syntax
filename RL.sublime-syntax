@@ -479,6 +479,18 @@ contexts:
       set: [constructor-member, constructor-arguments]
   constructor-arguments:
     - include: comments
+    - match: (#\s*&|&&)
+      scope: keyword
+      set:
+        - match: '{{ident}}'
+          scope: constant.numeric.rl
+          set:
+            - match: \}
+              scope: meta.function-call.c
+              pop: true
+        - match: \}
+          scope: meta.function-call.c
+          pop: true
     - match: \}
       scope: meta.function-call.c
       pop: true
