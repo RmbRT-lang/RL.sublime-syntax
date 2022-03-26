@@ -305,7 +305,7 @@ contexts:
       set: function
     - match: (?=\S)
       set:
-        - match: "#"
+        - match: (#\s*\??)
           scope: keyword
           set: function
         - include: function
@@ -360,10 +360,10 @@ contexts:
         1: keyword
         2: keyword
       pop: true
-    - match: \b(STATIC)\b|#
+    - match: \b(STATIC)\b|#\s*\??
       scope: keyword
       set:
-        - match: \b(STATIC|\#)\b
+        - match: \b(STATIC|\#\s*\??)\b
           scope: invalid.illegal
         - include: operator-overload
         - include: function-or-possibly-auto-variable
@@ -439,10 +439,10 @@ contexts:
     - match: \S
       scope: invalid.illegal
   class-member-visible:
-    - match: \b(STATIC)\b|#
+    - match: \b(STATIC)\b|#\s*\??
       scope: keyword
       set:
-        - match: \b(STATIC|\#)\b
+        - match: \b(STATIC)\b|\#\s*\??
           scope: invalid.illegal
         - include: operator-overload
         - include: function-or-possibly-auto-variable
@@ -743,7 +743,7 @@ contexts:
       - match: \@
         scope: invalid.illegal
       - include: function-after-head
-    - match: \#\s*\$?|\$\s*\#?
+    - match: \#\s*\??\s*\$?|\$\s*(\#\s*\??)?
       scope: keyword
     - match: \&\&?
       scope: storage.modifier.rl
@@ -755,7 +755,7 @@ contexts:
     - match: \b(INLINE)\b
       scope: keyword.rl
       set:
-      - match: \#\s*\$?|\$\s*\#?
+      - match: \#\s*\??\s*\$?|\$\s*(\#\s*\??)?
         scope: keyword
       - match: \&\&?
         scope: storage.modifier.rl
@@ -893,7 +893,7 @@ contexts:
       set: [variable-initialiser, type-expression]
     - match: '{{ident}}\s*(?=#|\$|::=)'
       set:
-      - match: (#)
+      - match: (#\s*\??)
         scope: keyword
         set:
         - match: (\$)
@@ -903,7 +903,7 @@ contexts:
       - match: (\$)
         scope: keyword
         set:
-        - match: (#)
+        - match: (#\s*\??)
           scope: keyword
           set: variable-short-initialiser
         - include: variable-short-initialiser
@@ -1187,7 +1187,7 @@ contexts:
       set: type-qualifier-step-qualifier
     - include: type-qualifier-step-qualifier
   type-qualifier-step-qualifier:
-    - match: \#
+    - match: \#\s*\??
       scope: storage.modifier.qualifier.rl
       set:
         - match: \$
@@ -1197,7 +1197,7 @@ contexts:
     - match: \$
       scope: storage.modifier.qualifier.rl
       set:
-        - match: \#
+        - match: \#\s*\??
           scope: storage.modifier.qualifier.rl
           set: type-qualifier-step-atomic
         - include: type-qualifier-step-atomic
@@ -1299,7 +1299,7 @@ contexts:
     - match: (\+[\+:]?|-[-:]?|~:?|!:?|\*|<-|&|\\|##)
       scope: keyword.operator.rl
       set: expression
-    - match: (\#)\s*(\$)?|(\$)\s*(#)?
+    - match: (\#\s*\??)\s*(\$)?|(\$)\s*(#\s*\??)?
       captures:
         1: keyword.rl
         2: keyword.rl
