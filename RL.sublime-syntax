@@ -127,19 +127,13 @@ contexts:
       scope: storage.type.name
       pop: true
   value-identifier:
-    - match: \b(DESTRUCTOR)\b
-      scope: keyword.rl
-      pop: true
-    - match: '\b(FROM)\b'
-      scope: keyword.rl
-      pop: true
     - match: '{{lowercase_ident}}(?=\s*::(?!=))'
       scope: meta.namespace.rl
       pop: true
     - match: '{{uppercase_ident}}(?=\s*::(?!=))'
       scope: storage.type.name.rl
       pop: true
-    - match: '{{ident}}(?=\s*\()'
+    - match: '{{ident}}(?=\s*(\(|\bVISIT\b))'
       scope: meta.function-call.rl
       pop: true
     - match: '(?<=::){{lowercase_ident}}(?!\s*::(?!=))'
@@ -283,7 +277,7 @@ contexts:
           scope: entity.name.type.rl storage.type.name.rl
           set: class-body
   concept:
-    - match: \b(CONCEPT)\b
+    - match: \b(MASK)\b
       scope: keyword.rl
       set:
         - match: '{{ident}}'
@@ -311,7 +305,7 @@ contexts:
       set: function
     - match: (?=\S)
       set:
-        - match: "#"
+        - match: (#\s*\??)
           scope: keyword
           set: function
         - include: function
@@ -366,10 +360,10 @@ contexts:
         1: keyword
         2: keyword
       pop: true
-    - match: \b(STATIC)\b|#
+    - match: \b(STATIC)\b|#\s*\??
       scope: keyword
       set:
-        - match: \b(STATIC|\#)\b
+        - match: \b(STATIC|\#\s*\??)\b
           scope: invalid.illegal
         - include: operator-overload
         - include: function-or-possibly-auto-variable
@@ -385,13 +379,16 @@ contexts:
         - match: \b(THIS)\b
           scope: keyword
           set: [function-meta, function-after-head]
+    - match: \<<<
+      scope: keyword
+      set: [function-meta, function-after-head, factory-arguments]
     - match: \<
       scope: keyword
       set: [function-meta, cast-operator-after-type, type-expression]
     - match: \b(THIS)\b
       scope: keyword
       set:
-        - match: ((\.|->)\*|\+\+|--)
+        - match: ((\.|->)\*|\+\+|--|!(?!=))
           scope: keyword.operator.rl
           set: [function-meta, function-after-head]
         - match: (\/|<<?<?=?|>>?>?=?|&[\&\=]?|\|[\|=]?|[-+*/%^]=?|[!:=]=|^)
@@ -442,13 +439,14 @@ contexts:
     - match: \S
       scope: invalid.illegal
   class-member-visible:
-    - match: \b(STATIC)\b|#
+    - match: \b(STATIC)\b|#\s*\??
       scope: keyword
       set:
-      - include: comments
-      - include: constructor
-      - include: destructor
-      - include: function-or-variable
+        - match: \b(STATIC)\b|\#\s*\??
+          scope: invalid.illegal
+        - include: operator-overload
+        - include: function-or-possibly-auto-variable
+        - include: class-member-visible
     - match: \b(VIRTUAL|ABSTRACT|OVERRIDE|FINAL)\b
       scope: keyword
       set:
@@ -475,12 +473,42 @@ contexts:
           - include: semicolon-close-noerr
       - include: blockstatement
       - include: semicolon-close-noerr
+  symbol-constant:
+    - match: (:(?!:))
+      scope: string.symbolic.rl
+      set:
+        - match: \s+
+          scope: invalid.illegal
+        - match: (<[->]|[<>?!])
+          scope: string.symbolic.rl
+          pop: true
+        - match: '{{ident}}'
+          scope: string.symbolic.rl
+          pop: true
+        - match: \S+
+          scope: invalid.illegal
   constructor:
+    - include: constructor-open
+    - match: (?=:)
+      set: [constructor-open, symbol-constant]
+  constructor-open:
     - match: \{
       scope: meta.function-call.c
       set: [constructor-member, constructor-arguments]
   constructor-arguments:
     - include: comments
+    - match: (#\s*&|&&)
+      scope: keyword
+      set:
+        - match: '{{ident}}'
+          scope: constant.numeric.rl
+          set:
+            - match: \}
+              scope: meta.function-call.c
+              pop: true
+        - match: \}
+          scope: meta.function-call.c
+          pop: true
     - match: \}
       scope: meta.function-call.c
       pop: true
@@ -502,6 +530,20 @@ contexts:
       - match: \b(INLINE)\b
         scope: invalid.illegal
       - include: constructor-member
+    - match: :=
+      scope: meta.function-call.c
+      set: [constructor-alias-after, expression]
+    - match: \(
+      scope: meta.function-call.c
+      set:
+        - match: \)
+          scope: meta.function-call.c
+          set: constructor-alias-after
+        - match: (?=\S)
+          set: [constructor-alias-after-arg, expression]
+    - match: '->'
+      scope: keyword
+      set: constructor-base-init
     - match: ':'
       scope: meta.function-call.rl
       set: constructor-member-init
@@ -509,25 +551,54 @@ contexts:
     - match: \;
       scope: semi_colon.eol.ccpp
       pop: true
+  constructor-alias-after:
+    - match: \;
+      scope: semi_colon.eol.ccpp
+      pop: true
+    - include: blockstatement
+    - match: \S+
+      scope: invalid.illegal.rl
+  constructor-alias-after-arg:
+    - match: \,
+      push: expression
+    - match: \)
+      scope: meta.function-call.c
+      set: constructor-alias-after
+    - match: \S+
+      scope: invalid.illegal.rl
+  constructor-base-init:
+    - match: (?=\S)
+      set: [constructor-base-init-after, constructor-init-after-name]
   constructor-member-init:
     - match: '{{ident}}(?=\s*\()'
       scope: variable.other.readwrite.member.c++
-      set: constructor-member-init-after-symbol
-    - match: (?=\S)
-      set: [constructor-member-init-after-symbol, type-expression-symbol]
-  constructor-member-init-after-symbol:
+      set: [constructor-member-init-after, constructor-init-after-name]
+  constructor-init-after-name:
     - match: \(
       scope: meta.function-call.rl
       set:
-      - match: \b(noinit)\b
+      - match: \b(NOINIT)\b
         scope: keyword.rl
         set:
         - match: \)
           scope: meta.function-call.rl
-          set: constructor-after-member-init
+          pop: true
       - match: (?=\S)
-        set: [constructor-after-member-init, arg-or-close]
-  constructor-after-member-init:
+        set: arg-or-close
+  constructor-base-init-after:
+    - include: blockstatement
+    - match: \,
+      set: constructor-base-init
+    - match: ;
+      scope: semi_colon.eol.ccpp
+      pop: true
+    - match: ':'
+      scope: meta.function-call.rl
+      set: constructor-member-init
+    - match: \S+
+      scope: invalid.illegal.rl
+      pop: true
+  constructor-member-init-after:
     - include: blockstatement
     - match: \,
       set: constructor-member-init
@@ -606,6 +677,13 @@ contexts:
         2: keyword.rl
         3: keyword.rl
         4: keyword.rl
+      set:
+        - match: \.
+          scope: keyword.rl
+          set: auto-variable-init
+        - include: auto-variable-init
+    - match: \.
+      scope: keyword.rl
       set: auto-variable-init
     - include: auto-variable-init
   auto-variable-init:
@@ -622,6 +700,22 @@ contexts:
     - meta_scope: meta.function.rl
     - match: ""
       pop: true
+  factory-arguments:
+    - include: comments
+    - match: \>\>\>
+      scope: keyword
+      pop: true
+    - match: (?=\S)
+      set: [factory-after-arg, function-arg]
+  factory-after-arg:
+    - include: comments
+    - match: \>\>\>
+      scope: keyword
+      pop: true
+    - match: \,
+      push: function-arg
+    - match: \S
+      scope: invlaid.illegal
   function-arguments:
     - include: comments
     - match: \)
@@ -675,7 +769,7 @@ contexts:
       - match: \@
         scope: invalid.illegal
       - include: function-after-head
-    - match: \#\s*\$?|\$\s*\#?
+    - match: \#\s*\??\s*\$?|\$\s*(\#\s*\??)?
       scope: keyword
     - match: \&\&?
       scope: storage.modifier.rl
@@ -687,7 +781,7 @@ contexts:
     - match: \b(INLINE)\b
       scope: keyword.rl
       set:
-      - match: \#\s*\$?|\$\s*\#?
+      - match: \#\s*\??\s*\$?|\$\s*(\#\s*\??)?
         scope: keyword
       - match: \&\&?
         scope: storage.modifier.rl
@@ -825,7 +919,7 @@ contexts:
       set: [variable-initialiser, type-expression]
     - match: '{{ident}}\s*(?=#|\$|::=)'
       set:
-      - match: (#)
+      - match: (#\s*\??)
         scope: keyword
         set:
         - match: (\$)
@@ -835,7 +929,7 @@ contexts:
       - match: (\$)
         scope: keyword
         set:
-        - match: (#)
+        - match: (#\s*\??)
           scope: keyword
           set: variable-short-initialiser
         - include: variable-short-initialiser
@@ -865,7 +959,7 @@ contexts:
     - match: ':='
       scope: keyword.operator.rl
       set:
-      - match: \b(noinit)\b
+      - match: \b(NOINIT)\b
         scope: keyword
         pop: true
       - include: expression
@@ -879,7 +973,7 @@ contexts:
     - match: \)
       scope: meta.function-call.rl
       pop: true
-    - match: \b(noinit)\b
+    - match: \b(NOINIT)\b
       scope: keyword.rl
       set:
       - match: \)
@@ -905,20 +999,17 @@ contexts:
     - match: \{
       scope: keyword
       set: [tuple-type-after-first, type-expression]
-    - match: \b(VOID)\b
+    - match: \b(VOID|U?(INT|CHAR)|BOOL|[US][1248]|SINGLE|DOUBLE)\b
       scope: keyword.rl
       set: type-qualifier
     - include: fn-signature
     - match: (?={{ident}}|\[|::(?!=))
       set: type-expression-symbol
-    - match: (:(?!:))
-      scope: string.symbolic.rl
-      set:
-        - match: \s+
-          scope: invalid.illegal
-        - match: '{{ident}}'
-          scope: string.symbolic.rl
-          set: type-qualifier
+    - match: :\.
+      scope: keyword.constant.rl
+      set: type-qualifier
+    - match: (?=:(?!:))
+      set: [type-qualifier, symbol-constant]
   tuple-type-after-first:
     - match: \,
       set: [tuple-type-after-n, type-expression]
@@ -1122,23 +1213,32 @@ contexts:
       set: type-qualifier-step-qualifier
     - include: type-qualifier-step-qualifier
   type-qualifier-step-qualifier:
-    - match: \#
+    - match: \#\s*\??
       scope: storage.modifier.qualifier.rl
       set:
         - match: \$
           scope: storage.modifier.qualifier.rl
-          set: type-qualifier-step-indirection
-        - include: type-qualifier-step-indirection
+          set: type-qualifier-step-atomic
+        - include: type-qualifier-step-atomic
     - match: \$
       scope: storage.modifier.qualifier.rl
       set:
-        - match: \#
+        - match: \#\s*\??
           scope: storage.modifier.qualifier.rl
+          set: type-qualifier-step-atomic
+        - include: type-qualifier-step-atomic
+    - include: type-qualifier-step-atomic
+  type-qualifier-step-atomic:
+    - match: \.
+      scope: keyword.rl
+      set:
+        - match: \.
+          scope: invalid.illegal.rl
+        - match: (?=\S)
           set: type-qualifier-step-indirection
-        - include: type-qualifier-step-indirection
     - include: type-qualifier-step-indirection
   type-qualifier-step-indirection:
-    - match: \*|\\|@|\.{2}[!?]
+    - match: ([*\\@^]|\.{2}[!?])
       scope: storage.modifier.indirection.rl
       set: type-qualifier
     - match: \[
@@ -1170,13 +1270,34 @@ contexts:
       set: type-expression-symbol
     - match: (?=\S)
       pop: true
+  expression-or-ambiguous-statement-expression:
+    - include: ambiguous-statement-expression
+    - include: expression
   expression:
     - include: comments
     - include: string
     - include: char
+    - include: unambiguous-statement-expression
     - match: \b(TRUE|FALSE|NULL)\b
       scope: constant.language.rl
       set: expression-after-operand
+    - match: \b(TYPE)\b
+      scope: keyword
+      set:
+        - match: \b(TYPE)\b
+          scope: keyword
+          set:
+            - match: \(
+              set: [expression-pop-parenthese, type-expression]
+        - match: \b(STATIC)\b
+          scope: keyword
+          set:
+            - match: \(
+              set: [expression-pop-parenthese, expression]
+        - match: \(
+          set: [expression-pop-parenthese, expression]
+        - match: \S
+          scope: invalid.illegal
     - match: \b(SIZEOF)(...)?\b
       scope: keyword.rl
       set:
@@ -1193,10 +1314,10 @@ contexts:
         - match: \.{2}[!?]
           scope: invalid.illegal
         - include: expression
-    - match: \@@?
+    - match: \@@?|\^
       scope: keyword.control.rl
       set:
-        - match: \@@?
+        - match: \@@?|\^
           scope: invalid.illegal
         - match: \.{2}[!?]
           scope: invalid.illegal
@@ -1204,14 +1325,14 @@ contexts:
     - match: (\+[\+:]?|-[-:]?|~:?|!:?|\*|<-|&|\\|##)
       scope: keyword.operator.rl
       set: expression
-    - match: (\#)\s*(\$)?|(\$)\s*(#)?
+    - match: (\#\s*\??)\s*(\$)?|(\$)\s*(#\s*\??)?
       captures:
         1: keyword.rl
         2: keyword.rl
         3: keyword.rl
         4: keyword.rl
     - match: \(
-      set: [expression-tuple-after-value, expression]
+      set: [expression-tuple-after-value, expression-or-ambiguous-statement-expression]
     - match: (?=\[)
       set: [expression-after-operand, expression-symbol]
     - match: \<<<
@@ -1242,6 +1363,9 @@ contexts:
       set:
         - match: \s+
           scope: invalid.illegal
+        - match: (<[->]|[<>!?])
+          scope: string.symbolic.rl
+          set: expression-after-operand
         - match: '{{ident}}'
           scope: string.symbolic.rl
           set: expression-after-operand
@@ -1333,6 +1457,17 @@ contexts:
     - match: ([\.]|->)\*
       scope: keyword.operator.rl
       set: expression
+    - match: \b(VISIT)\b
+      scope: keyword.rl
+      set:
+        - match: \(
+          scope: meta.function-call.c
+          set:
+            - match: \)
+              scope: invalid.illegal
+              set: expression-after-operand
+            - match: (?=\S)
+              set: [call-arguments, expression]
     - match: ([\.]|->)
       scope: period.ccpp
       set:
@@ -1358,13 +1493,10 @@ contexts:
               - match: \)
                 scope: keyword period.ccpp
                 set: expression-after-operand
-      - match: \b(DESTRUCTOR)\b
-        scope: keyword.rl
-        set: expression-after-operand
-      - match: \b([a-zA-Z_][a-zA-Z0-9_]*)\b(?!\s*\()
+      - match: \b([a-zA-Z_][a-zA-Z0-9_]*)\b(?!\s*(\(|\bVISIT\b))
         scope: variable.other.readwrite.member.rl
         set: expression-after-operand
-      - match: \b([a-zA-Z_][a-zA-Z0-9_]*)\b(?=\s*\()
+      - match: \b([a-zA-Z_][a-zA-Z0-9_]*)\b(?=\s*(\(|\bVISIT\b))
         scope: meta.function-call.c
         set: expression-after-operand
       - match: \S
@@ -1432,8 +1564,10 @@ contexts:
   statement:
     - include: comments
     - include: blockstatement
+    - include: wait-or-sleep
     - include: if
     - include: throw
+    - include: type-switch
     - include: switch
     - include: while
     - include: do-loop
@@ -1447,6 +1581,18 @@ contexts:
     - include: variable-or-expression-stmt
     - match: \S
       scope: invalid.illegal
+  unambiguous-statement-expression:
+      - include: comments
+      - include: blockstatement
+      - include: type-switch
+      - include: switch
+      - include: do-loop
+  ambiguous-statement-expression:
+      - include: comments
+      - include: if
+      - include: while
+      - include: for
+      - include: try
   blockstatement:
     - match: '{'
       scope: open.curly.bracket.block.rl
@@ -1465,6 +1611,13 @@ contexts:
         pop: true
       - match: (?=\S)
         push: statement
+  wait-or-sleep:
+    - match: \.{3}
+      scope: keyword
+      set:
+        - include: semicolon-close
+        - match: (?=\S)
+          set: [semicolon-close, expression]
   expression-stmt:
     - match: (?=\S)
       set: [semicolon-close, expression]
@@ -1496,6 +1649,37 @@ contexts:
       set: [statement, control-label]
     - match: (?=\S)
       pop: true
+  type-switch:
+    - match: \b(TYPE\s+SWITCH)\b
+      scope: keyword.control.rl
+      set:
+        - match: \b(STATIC)\b
+          scope: keyword
+          set: type-switch-value
+        - include: type-switch-value
+  type-switch-value:
+    - match: \(
+      set: [type-switch-after-value, expression]
+  type-switch-after-value:
+    - match: \)
+      set:
+        - match: \{
+          scope: open.curly.bracket.block.rl
+          set: type-case
+  type-case:
+    - match: \b(DEFAULT)\b
+      scope: keyword.control.rl
+      set: type-case-after-value
+    - match: (?=\S)
+      set: [type-case-after-value, type-expression]
+  type-case-after-value:
+    - match: \,
+      push: type-expression
+    - match: ':'
+      set: [after-type-case, statement]
+  after-type-case:
+    - include: blockclose
+    - include: type-case
   switch:
     - match: \b(SWITCH)\b
       scope: keyword.control.rl
@@ -1504,6 +1688,9 @@ contexts:
     - match: \(
       set: [switch-body, switch-after-expression, variable-or-expression]
   switch-after-expression:
+    - match: \;
+      scope: semi_colon.eol.ccpp
+      set: [parenthese-close-pop, expression]
     - match: \)
       pop: true
   switch-body:
@@ -1511,15 +1698,11 @@ contexts:
       scope: open.curly.bracket.block.rl
       set: case
   case:
-    - match: \b(CASE)\b
-      scope: keyword.control.rl
-      set: [case-after-value, expression, control-label]
     - match: \b(DEFAULT)\b
       scope: keyword.control.rl
       set: [case-end, control-label]
-    - match: \S
-      scope: invalid.illegal.rl
-      pop: true
+    - match: (?=\S)
+      set: [case-after-value, expression, control-label]
   case-after-value:
     - match: \,
       push: expression
@@ -1633,6 +1816,9 @@ contexts:
     - match: \)
       pop: true
   return:
+    - match: =(?!=)
+      scope: keyword.control.rl
+      set: [semicolon-close, expression]
     - match: \b(RETURN)\b
       scope: keyword.control.rl
       set:
@@ -1715,6 +1901,17 @@ contexts:
     - match: /\).*$
       scope: invalid.illegal.stray-comment-end.c
   line-comment:
+    - match: ///
+      captures:
+        0: punctuation.definition.comment.c
+      push:
+        - meta_scope: string.quoted.double.rl
+        - match: $\n?
+          pop: true
+        - match: \\\s*$(\s|\S)
+          push:
+          - match: \s|\S
+            pop: true
     - match: //
       captures:
         0: punctuation.definition.comment.c
