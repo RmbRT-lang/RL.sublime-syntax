@@ -530,6 +530,17 @@ contexts:
       - match: \b(INLINE)\b
         scope: invalid.illegal
       - include: constructor-member
+    - match: :=
+      scope: meta.function-call.c
+      set: [constructor-alias-after, expression]
+    - match: \(
+      scope: meta.function-call.c
+      set:
+        - match: \)
+          scope: meta.function-call.c
+          set: constructor-alias-after
+        - match: (?=\S)
+          set: [constructor-alias-after-arg, expression]
     - match: '->'
       scope: keyword
       set: constructor-base-init
@@ -540,6 +551,21 @@ contexts:
     - match: \;
       scope: semi_colon.eol.ccpp
       pop: true
+  constructor-alias-after:
+    - match: \;
+      scope: semi_colon.eol.ccpp
+      pop: true
+    - include: blockstatement
+    - match: \S+
+      scope: invalid.illegal.rl
+  constructor-alias-after-arg:
+    - match: \,
+      push: expression
+    - match: \)
+      scope: meta.function-call.c
+      set: constructor-alias-after
+    - match: \S+
+      scope: invalid.illegal.rl
   constructor-base-init:
     - match: (?=\S)
       set: [constructor-base-init-after, constructor-init-after-name]
