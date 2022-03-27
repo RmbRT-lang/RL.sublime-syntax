@@ -551,7 +551,7 @@ contexts:
     - match: \(
       scope: meta.function-call.rl
       set:
-      - match: \b(noinit)\b
+      - match: \b(NOINIT)\b
         scope: keyword.rl
         set:
         - match: \)
@@ -933,7 +933,7 @@ contexts:
     - match: ':='
       scope: keyword.operator.rl
       set:
-      - match: \b(noinit)\b
+      - match: \b(NOINIT)\b
         scope: keyword
         pop: true
       - include: expression
@@ -947,7 +947,7 @@ contexts:
     - match: \)
       scope: meta.function-call.rl
       pop: true
-    - match: \b(noinit)\b
+    - match: \b(NOINIT)\b
       scope: keyword.rl
       set:
       - match: \)
