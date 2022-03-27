@@ -542,7 +542,7 @@ contexts:
       pop: true
   constructor-base-init:
     - match: (?=\S)
-      set: [constructor-base-init-after, constructor-init-after-name, type-expression-symbol]
+      set: [constructor-base-init-after, constructor-init-after-name]
   constructor-member-init:
     - match: '{{ident}}(?=\s*\()'
       scope: variable.other.readwrite.member.c++
