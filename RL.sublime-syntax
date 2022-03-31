@@ -570,8 +570,8 @@ contexts:
     - match: (?=\S)
       set: [constructor-base-init-after, constructor-init-after-name]
   constructor-member-init:
-    - match: '{{ident}}(?=\s*\()'
-      scope: variable.other.readwrite.member.c++
+    - match: '{{ident}}'
+      scope: variable.other.member.rl
       set: [constructor-member-init-after, constructor-init-after-name]
   constructor-init-after-name:
     - match: \(
@@ -585,6 +585,13 @@ contexts:
           pop: true
       - match: (?=\S)
         set: arg-or-close
+    - match: :=
+      scope: keyword.operator.rl
+      set:
+      - match: \b(NOINIT)\b
+        scope: keyword.rl
+        pop: true
+      - include: expression
   constructor-base-init-after:
     - include: blockstatement
     - match: \,
