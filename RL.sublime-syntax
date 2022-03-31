@@ -1690,7 +1690,12 @@ contexts:
   switch:
     - match: \b(SWITCH)\b
       scope: keyword.control.rl
-      set: [switch-expression, control-label]
+      set:
+        - match: \?
+          scope: keyword
+          set: [switch-expression, control-label]
+        - match: (?=\S)
+          set: [switch-expression, control-label]
   switch-expression:
     - match: \(
       set: [switch-body, switch-after-expression, variable-or-expression]
