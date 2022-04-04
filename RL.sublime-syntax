@@ -1537,12 +1537,18 @@ contexts:
       - match: (?=\S)
         set: [call-arguments, expression]
     - match: \[
-      set: [expression-pop-bracket, expression]
+      set: [expression-subscript-args, expression]
     - match: \?
       scope: keyword.control.rl
       set: [expression-ternary-colon, expression]
     - match: (?=\S)
       pop: true
+  expression-subscript-args:
+    - match: \,
+      push: expression
+    - include: expression-pop-bracket
+    - match: \S
+      scope: invalid.illegal
   call-arguments:
     - match: \)
       scope: meta.function-call.c
