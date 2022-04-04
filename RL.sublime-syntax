@@ -1584,6 +1584,7 @@ contexts:
     - include: return
     - include: try
     - include: assert
+    - include: die
     - include: static-variable-stmt
     - include: variable-or-expression-stmt
     - match: \S
@@ -1880,6 +1881,13 @@ contexts:
       set:
         - match: \(
           set: [semicolon-close, parenthese-close-pop, expression]
+  die:
+    - match: \b(DIE)\b
+      scope: keyword.control.rl
+      set:
+        - include: semicolon-close
+        - match: (?=\S)
+          set: [semicolon-close, string]
   comments:
     - match: ^\(/ =\s*(.*?)\s*= /\)$\n?
       scope: comment.block.c
