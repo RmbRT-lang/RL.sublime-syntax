@@ -1305,7 +1305,7 @@ contexts:
           set: [expression-pop-parenthese, expression]
         - match: \S
           scope: invalid.illegal
-    - match: \b(SIZEOF)(...)?\b
+    - match: \b(SIZEOF)\b(\.\.\.)?
       scope: keyword.rl
       set:
         - match: \(
