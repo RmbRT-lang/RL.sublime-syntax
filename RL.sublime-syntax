@@ -494,7 +494,7 @@ contexts:
   constructor-open:
     - match: \{
       scope: meta.function-call.c
-      set: [constructor-member, constructor-arguments]
+      set: [constructor-after-arguments, constructor-arguments]
   constructor-arguments:
     - include: comments
     - match: (#\s*&|&&)
@@ -523,13 +523,12 @@ contexts:
       push: function-arg
     - match: \S
       scope: invalid.illegal
-  constructor-member:
+  constructor-after-arguments:
     - match: \b(INLINE)\b
       scope: keyword.rl
-      set:
-      - match: \b(INLINE)\b
-        scope: invalid.illegal
-      - include: constructor-member
+      set: constructor-member
+    - include: constructor-member
+  constructor-member:
     - match: :=
       scope: meta.function-call.c
       set: [constructor-alias-after, expression]
@@ -772,96 +771,79 @@ contexts:
   function-after-head:
     - match: \@
       scope: keyword.rl
-      set:
-      - match: \@
-        scope: invalid.illegal
-      - include: function-after-head
+      set: function-after-head-after-async
+    - include: function-after-head-after-async
+  function-after-head-after-async:
     - match: \#\s*\??\s*\$?|\$\s*(\#\s*\??)?
-      scope: keyword
+      scope: keyword.rl
+      set: function-after-auto-return
     - match: \&\&?
       scope: storage.modifier.rl
+      set: function-after-auto-return
+    - include: function-after-auto-return
+    - match: \?
+      scope: keyword
+      set:
+        - match: (&|&&)
+          scope: storage.modifier.rl
+          set:
+            - match: \b(INLINE)\b
+              scope: keyword.rl
+              set: blockstatement
+            - include: blockstatement
+        - match: \b(INLINE)\b
+          scope: keyword.rl
+          set: blockstatement
+        - include: blockstatement
+    - match: (?=\S)
+      set: [function-after-return, type-expression]
+    - match: \S
+      scope: invalid.illegal
+  function-after-auto-return:
+    - match: \b(INLINE)\b
+      scope: keyword.rl
+      set: function-after-auto-return-after-inline
+    - include: function-after-auto-return-after-inline
+  function-after-auto-return-after-inline:
     - match: '::='
       scope: keyword.operator.rl
       set:
       - include: comments
       - include: expression-stmt
-    - match: \b(INLINE)\b
-      scope: keyword.rl
-      set:
-      - match: \#\s*\??\s*\$?|\$\s*(\#\s*\??)?
-        scope: keyword
-      - match: \&\&?
-        scope: storage.modifier.rl
-      - match: '::='
-        scope: keyword.operator.rl
-        set: expression-stmt
-      - match: \?
-        scope: keyword
-        set: blockstatement
-      - match: (?=\S)
-        set: [function-5, type-expression]
-      - match: \S
-        scope: invalid.illegal
-    - match: \?
-      scope: keyword
-      set: blockstatement
-    - match: (?=\S)
-      set: [function-5, type-expression]
-    - match: \S
-      scope: invalid.illegal
   function-after-head-cast:
     - match: \@
       scope: keyword.rl
-      set:
-      - match: \@
-        scope: invalid.illegal
-      - include: function-after-head
+      set: function-after-head-cast-after-async
+    - include: function-after-head-cast-after-async
+  function-after-head-cast-after-async:
+    - match: \b(INLINE)\b
+      scope: keyword.rl
+      set: function-cast-body
+    - include: function-cast-body
+  function-cast-body:
     - match: ':='
       scope: keyword.operator.rl
       set:
-      - match: \b(INLINE)\b
-        scope: keyword.rl
-        set:
-        - include: comments
-        - include: expression-stmt
-        - match: \S
-          scope: invalid.illegal
       - include: comments
       - include: expression-stmt
-    - match: \b(INLINE)\b
-      scope: keyword.rl
-      set:
-      - match: ':='
-        scope: keyword.operator.rl
-        set: expression-stmt
-      - include: blockstatement
-      - match: (?=\S)
-        set: [function-5, type-expression]
-      - match: \S
-        scope: invalid.illegal
     - include: blockstatement
-    - match: (?=\S)
-      set: [function-5, type-expression]
     - match: \S
       scope: invalid.illegal
-  function-5:
+  function-after-return:
+    - match: \b(INLINE)\b
+      scope: keyword.rl
+      set: function-after-return-after-inline
+    - include: function-after-return-after-inline
+  function-after-return-after-inline:
     - meta_scope: meta.function.rl
     - include: comments
-    - include: semicolon-close
-    - match: (&|&&)
-      scope: storage.modifier.rl
-      set:
-        - match: ;
-          scope: semi_colon.eol.ccpp
-          pop: true
-        - match: :=
-          scope: keyword.operator.rl
-          set: [semicolon-close, expression]
-        - include: blockstatement
     - match: :=
       scope: keyword.operator.rl
       set: [semicolon-close, expression]
     - include: blockstatement
+    - match: ;
+      scope: semi_colon.eol.ccpp
+      pop: true
   semicolon-close:
     - include: comments
     - match: ;
