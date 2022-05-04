@@ -494,7 +494,7 @@ contexts:
   constructor-open:
     - match: \{
       scope: meta.function-call.c
-      set: [constructor-member, constructor-arguments]
+      set: [constructor-after-arguments, constructor-arguments]
   constructor-arguments:
     - include: comments
     - match: (#\s*&|&&)
@@ -523,13 +523,12 @@ contexts:
       push: function-arg
     - match: \S
       scope: invalid.illegal
-  constructor-member:
+  constructor-after-arguments:
     - match: \b(INLINE)\b
       scope: keyword.rl
-      set:
-      - match: \b(INLINE)\b
-        scope: invalid.illegal
-      - include: constructor-member
+      set: constructor-member
+    - include: constructor-member
+  constructor-member:
     - match: :=
       scope: meta.function-call.c
       set: [constructor-alias-after, expression]
@@ -570,8 +569,8 @@ contexts:
     - match: (?=\S)
       set: [constructor-base-init-after, constructor-init-after-name]
   constructor-member-init:
-    - match: '{{ident}}(?=\s*\()'
-      scope: variable.other.readwrite.member.c++
+    - match: '{{ident}}'
+      scope: variable.other.member.rl
       set: [constructor-member-init-after, constructor-init-after-name]
   constructor-init-after-name:
     - match: \(
@@ -585,6 +584,13 @@ contexts:
           pop: true
       - match: (?=\S)
         set: arg-or-close
+    - match: :=
+      scope: keyword.operator.rl
+      set:
+      - match: \b(NOINIT)\b
+        scope: keyword.rl
+        pop: true
+      - include: expression
   constructor-base-init-after:
     - include: blockstatement
     - match: \,
@@ -765,96 +771,79 @@ contexts:
   function-after-head:
     - match: \@
       scope: keyword.rl
-      set:
-      - match: \@
-        scope: invalid.illegal
-      - include: function-after-head
+      set: function-after-head-after-async
+    - include: function-after-head-after-async
+  function-after-head-after-async:
     - match: \#\s*\??\s*\$?|\$\s*(\#\s*\??)?
-      scope: keyword
+      scope: keyword.rl
+      set: function-after-auto-return
     - match: \&\&?
       scope: storage.modifier.rl
+      set: function-after-auto-return
+    - include: function-after-auto-return
+    - match: \?
+      scope: keyword
+      set:
+        - match: (&|&&)
+          scope: storage.modifier.rl
+          set:
+            - match: \b(INLINE)\b
+              scope: keyword.rl
+              set: blockstatement
+            - include: blockstatement
+        - match: \b(INLINE)\b
+          scope: keyword.rl
+          set: blockstatement
+        - include: blockstatement
+    - match: (?=\S)
+      set: [function-after-return, type-expression]
+    - match: \S
+      scope: invalid.illegal
+  function-after-auto-return:
+    - match: \b(INLINE)\b
+      scope: keyword.rl
+      set: function-after-auto-return-after-inline
+    - include: function-after-auto-return-after-inline
+  function-after-auto-return-after-inline:
     - match: '::='
       scope: keyword.operator.rl
       set:
       - include: comments
       - include: expression-stmt
-    - match: \b(INLINE)\b
-      scope: keyword.rl
-      set:
-      - match: \#\s*\??\s*\$?|\$\s*(\#\s*\??)?
-        scope: keyword
-      - match: \&\&?
-        scope: storage.modifier.rl
-      - match: '::='
-        scope: keyword.operator.rl
-        set: expression-stmt
-      - match: \?
-        scope: keyword
-        set: blockstatement
-      - match: (?=\S)
-        set: [function-5, type-expression]
-      - match: \S
-        scope: invalid.illegal
-    - match: \?
-      scope: keyword
-      set: blockstatement
-    - match: (?=\S)
-      set: [function-5, type-expression]
-    - match: \S
-      scope: invalid.illegal
   function-after-head-cast:
     - match: \@
       scope: keyword.rl
-      set:
-      - match: \@
-        scope: invalid.illegal
-      - include: function-after-head
+      set: function-after-head-cast-after-async
+    - include: function-after-head-cast-after-async
+  function-after-head-cast-after-async:
+    - match: \b(INLINE)\b
+      scope: keyword.rl
+      set: function-cast-body
+    - include: function-cast-body
+  function-cast-body:
     - match: ':='
       scope: keyword.operator.rl
       set:
-      - match: \b(INLINE)\b
-        scope: keyword.rl
-        set:
-        - include: comments
-        - include: expression-stmt
-        - match: \S
-          scope: invalid.illegal
       - include: comments
       - include: expression-stmt
-    - match: \b(INLINE)\b
-      scope: keyword.rl
-      set:
-      - match: ':='
-        scope: keyword.operator.rl
-        set: expression-stmt
-      - include: blockstatement
-      - match: (?=\S)
-        set: [function-5, type-expression]
-      - match: \S
-        scope: invalid.illegal
     - include: blockstatement
-    - match: (?=\S)
-      set: [function-5, type-expression]
     - match: \S
       scope: invalid.illegal
-  function-5:
+  function-after-return:
+    - match: \b(INLINE)\b
+      scope: keyword.rl
+      set: function-after-return-after-inline
+    - include: function-after-return-after-inline
+  function-after-return-after-inline:
     - meta_scope: meta.function.rl
     - include: comments
-    - include: semicolon-close
-    - match: (&|&&)
-      scope: storage.modifier.rl
-      set:
-        - match: ;
-          scope: semi_colon.eol.ccpp
-          pop: true
-        - match: :=
-          scope: keyword.operator.rl
-          set: [semicolon-close, expression]
-        - include: blockstatement
     - match: :=
       scope: keyword.operator.rl
       set: [semicolon-close, expression]
     - include: blockstatement
+    - match: ;
+      scope: semi_colon.eol.ccpp
+      pop: true
   semicolon-close:
     - include: comments
     - match: ;
@@ -1298,7 +1287,7 @@ contexts:
           set: [expression-pop-parenthese, expression]
         - match: \S
           scope: invalid.illegal
-    - match: \b(SIZEOF)(...)?\b
+    - match: \b(SIZEOF)\b(\.\.\.)?
       scope: keyword.rl
       set:
         - match: \(
@@ -1530,12 +1519,18 @@ contexts:
       - match: (?=\S)
         set: [call-arguments, expression]
     - match: \[
-      set: [expression-pop-bracket, expression]
+      set: [expression-subscript-args, expression]
     - match: \?
       scope: keyword.control.rl
       set: [expression-ternary-colon, expression]
     - match: (?=\S)
       pop: true
+  expression-subscript-args:
+    - match: \,
+      push: expression
+    - include: expression-pop-bracket
+    - match: \S
+      scope: invalid.illegal
   call-arguments:
     - match: \)
       scope: meta.function-call.c
@@ -1577,6 +1572,7 @@ contexts:
     - include: return
     - include: try
     - include: assert
+    - include: die
     - include: static-variable-stmt
     - include: variable-or-expression-stmt
     - match: \S
@@ -1683,7 +1679,12 @@ contexts:
   switch:
     - match: \b(SWITCH)\b
       scope: keyword.control.rl
-      set: [switch-expression, control-label]
+      set:
+        - match: \?
+          scope: keyword
+          set: [switch-expression, control-label]
+        - match: (?=\S)
+          set: [switch-expression, control-label]
   switch-expression:
     - match: \(
       set: [switch-body, switch-after-expression, variable-or-expression]
@@ -1868,6 +1869,13 @@ contexts:
       set:
         - match: \(
           set: [semicolon-close, parenthese-close-pop, expression]
+  die:
+    - match: \b(DIE)\b
+      scope: keyword.control.rl
+      set:
+        - include: semicolon-close
+        - match: (?=\S)
+          set: [semicolon-close, string]
   comments:
     - match: ^\(/ =\s*(.*?)\s*= /\)$\n?
       scope: comment.block.c
