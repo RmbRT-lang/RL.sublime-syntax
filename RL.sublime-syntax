@@ -1633,6 +1633,11 @@ contexts:
       set: [if-condition, control-label]
   if-condition:
       - include: comments
+      - match: \!
+        scope: keyword.operator.rl
+        set: if-condition-after-negation
+      - include: if-condition-after-negation
+  if-condition-after-negation:
       - match: \(
         set: [if-after-condition, variable-or-expression]
   if-after-condition:
