@@ -1630,7 +1630,12 @@ contexts:
   if:
     - match: \b(IF)\b
       scope: keyword.control.rl
-      set: [if-condition, control-label]
+      set: [if-condition, control-label, if-maybe-expose-variable]
+  if-maybe-expose-variable:
+    - match: ":"
+      scope: keyword.rl
+    - match: (?=\S)
+      pop: true
   if-condition:
       - include: comments
       - match: \!
