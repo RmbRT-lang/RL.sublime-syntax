@@ -774,42 +774,45 @@ contexts:
       set: function-after-head-after-async
     - include: function-after-head-after-async
   function-after-head-after-async:
-    - match: \#\s*\??\s*\$?|\$\s*(\#\s*\??)?
-      scope: keyword.rl
-      set: function-after-auto-return
-    - match: \&\&?
-      scope: storage.modifier.rl
-      set: function-after-auto-return
-    - include: function-after-auto-return
+    - include: function-auto-return
+    - include: function-type-return
+  function-type-return:
+    - match: (?=\S)
+      set: [function-after-return-after-inline, function-inline, type-expression]
+  function-auto-return:
     - match: \?
       scope: keyword
-      set:
-        - match: (&|&&)
-          scope: storage.modifier.rl
-          set:
-            - match: \b(INLINE)\b
-              scope: keyword.rl
-              set: blockstatement
-            - include: blockstatement
-        - match: \b(INLINE)\b
-          scope: keyword.rl
-          set: blockstatement
-        - include: blockstatement
+      set: [function-after-auto-return-after-inline, function-inline, function-auto-return-reference, function-auto-return-qualifier]
+  function-auto-return-qualifier:
+    - match: \#\??\s*\$?|\$\s*(\#\??)?
+      scope: keyword.rl
+      pop: true
     - match: (?=\S)
-      set: [function-after-return, type-expression]
-    - match: \S
-      scope: invalid.illegal
-  function-after-auto-return:
+      pop: true
+  function-auto-return-reference:
+    - match: \&\&?
+      scope: storage.modifier.rl
+      pop: true
+    - match: (?=\S)
+      pop: true
+  function-inline:
     - match: \b(INLINE)\b
       scope: keyword.rl
-      set: function-after-auto-return-after-inline
+      pop: true
+    - match: (?=\S)
+      pop: true
+  function-after-return-after-inline:
+    - match: ;
+      scope: semi_colon.eol.ccpp
+      pop: true
     - include: function-after-auto-return-after-inline
   function-after-auto-return-after-inline:
-    - match: '::='
+    - match: ':='
       scope: keyword.operator.rl
       set:
       - include: comments
       - include: expression-stmt
+    - include: blockstatement
   function-after-head-cast:
     - match: \@
       scope: keyword.rl
@@ -829,21 +832,6 @@ contexts:
     - include: blockstatement
     - match: \S
       scope: invalid.illegal
-  function-after-return:
-    - match: \b(INLINE)\b
-      scope: keyword.rl
-      set: function-after-return-after-inline
-    - include: function-after-return-after-inline
-  function-after-return-after-inline:
-    - meta_scope: meta.function.rl
-    - include: comments
-    - match: :=
-      scope: keyword.operator.rl
-      set: [semicolon-close, expression]
-    - include: blockstatement
-    - match: ;
-      scope: semi_colon.eol.ccpp
-      pop: true
   semicolon-close:
     - include: comments
     - match: ;
