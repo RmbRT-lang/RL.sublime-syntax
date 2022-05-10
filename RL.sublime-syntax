@@ -391,7 +391,7 @@ contexts:
         - match: ((\.|->)\*|\+\+|--|!(?!=))
           scope: keyword.operator.rl
           set: [function-meta, function-after-head]
-        - match: (\/|<<?<?=?|>>?>?=?|&[\&\=]?|\|[\|=]?|[-+*/%^]=?|[!:=]=|^)
+        - match: (\/|<-|<<?<?=?|>>?>?=?|&[\&\=]?|\|[\|=]?|[-+*/%^]=?|[!:=]=|^)
           scope: keyword.operator.rl
           set: operator-after-name
         - include: operator-after-name
