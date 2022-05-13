@@ -497,6 +497,9 @@ contexts:
       set: [constructor-after-arguments, constructor-arguments]
   constructor-arguments:
     - include: comments
+    - match: \.\.\.
+      scope: keyword
+      pop: true
     - match: (#\s*&|&&)
       scope: keyword
       set:
