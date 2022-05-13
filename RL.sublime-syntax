@@ -1188,7 +1188,7 @@ contexts:
     - include: comments
     - include: type-qualifier-step-nodecay
   type-qualifier-step-nodecay:
-    - match: \!
+    - match: \!?\s*\+?
       scope: keyword.rl
       set: type-qualifier-step-qualifier
     - include: type-qualifier-step-qualifier
