@@ -1288,6 +1288,9 @@ contexts:
               set: [expression-pop-parenthese, expression]
             - match: (?=\S)
               set: [expression-pop-parenthese, type-expression]
+    - match: "###"
+      scope: keyword.operator.rl
+      set: type-expression-symbol-root
     - match: \.{2}[!?]
       scope: keyword.rl
       set:
