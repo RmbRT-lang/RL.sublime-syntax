@@ -1913,7 +1913,18 @@ contexts:
     - match: /\).*$
       scope: invalid.illegal.stray-comment-end.c
   line-comment:
-    - match: ///
+    - match: ////(?!/)
+      captures:
+        0: punctuation.definition.comment.c
+      push:
+        - meta_scope: constant.numeric.rl
+        - match: $\n?
+          pop: true
+        - match: \\\s*$(\s|\S)
+          push:
+          - match: \s|\S
+            pop: true
+    - match: ///(?!/)
       captures:
         0: punctuation.definition.comment.c
       push:
