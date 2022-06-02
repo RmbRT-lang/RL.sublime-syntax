@@ -500,6 +500,12 @@ contexts:
     - match: \.\.\.
       scope: keyword
       pop: true
+    - match: \b(BARE)\b
+      scope: keyword
+      set:
+        - match: \}
+          scope: meta.function-call.c
+          pop: true
     - match: (#\s*&|&&)
       scope: keyword
       set:
@@ -1258,7 +1264,7 @@ contexts:
     - include: string
     - include: char
     - include: unambiguous-statement-expression
-    - match: \b(TRUE|FALSE|NULL)\b
+    - match: \b(TRUE|FALSE|NULL|BARE)\b
       scope: constant.language.rl
       set: expression-after-operand
     - match: \b(TYPE)\b
