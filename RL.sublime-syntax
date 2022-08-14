@@ -892,9 +892,6 @@ contexts:
       set: [auto-variable]
     - match: (?=\S)
       set: expression-stmt
-  variable-or-expression-stmt-or-empty:
-    - include: semicolon-close
-    - include: variable-or-expression-stmt
   variable-or-expression:
     - include: comments
     - match: '({{ident}})\s*(::=)'
@@ -1819,7 +1816,21 @@ contexts:
       set: [for-after-label, control-label]
   for-after-label:
       - match: \(
-        set: [statement, for-condition, variable-or-expression-stmt-or-empty]
+        set: [statement, for-init-term]
+  for-init-term:
+    - match: (?=\;)
+      set: [for-condition, semicolon-close]
+    - match: (?=\S)
+      set: [for-after-init, variable-or-expression]
+  for-after-init:
+    - include: parenthese-close-pop
+    - match: (?=\;)
+      set: [for-after-iter-init, semicolon-close]
+  for-after-iter-init:
+    - match: (--)\s*(?=\))
+      scope: keyword.operator.rl
+      set: parenthese-close-pop
+    - include: for-condition
   for-condition:
     - match: (?=\;)
       set: [for-post-stmt, semicolon-close]
