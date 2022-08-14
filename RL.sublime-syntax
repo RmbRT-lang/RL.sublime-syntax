@@ -115,6 +115,9 @@ contexts:
     - match: (?=\S)
       pop: true
   type-identifier:
+    - match: \b(THIS)\b
+      scope: keyword.rl
+      pop: true
     - match: \b([A-Z][a-zA-Z0-9]+|[a-z_][a-z0-9_]*_t)\b
       scope: storage.type.name
       pop: true
@@ -1029,6 +1032,9 @@ contexts:
       scope: meta.namespace.rl
       set: type-expression-symbol-root
   type-expression-symbol-root:
+    - match: \b(THIS|NULL)\b
+      scope: keyword.rl
+      set: type-expression-after-name
     - match: '{{lowercase_ident}}(?=::)'
       scope: meta.namespace.rl
       set: type-expression-after-name
