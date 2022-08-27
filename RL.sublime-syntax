@@ -1670,7 +1670,9 @@ contexts:
           set: type-switch-value
         - include: type-switch-value
   type-switch-value:
-    - match: \(
+    - match: (\?)?\s*\(
+      captures:
+        1: keyword.control.rl
       set: [type-switch-after-value, expression]
   type-switch-after-value:
     - match: \)
