@@ -1526,9 +1526,14 @@ contexts:
         set: [call-arguments, expression]
     - match: \[
       set: [expression-subscript-args, expression]
-    - match: \?
+    - match: \?\?
       scope: keyword.control.rl
       set: [expression-ternary-colon, expression]
+    - match: \?
+      scope: keyword.operator.rl
+    - match: \b(OR)\b
+      scope: keyword.control.rl
+      set: expression
     - match: (?=\S)
       pop: true
   expression-subscript-args:
