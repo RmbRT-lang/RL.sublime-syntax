@@ -477,19 +477,25 @@ contexts:
       - include: blockstatement
       - include: semicolon-close-noerr
   symbol-constant:
-    - match: (:(?!:))
+    - match: (:(?![:=]))
       scope: string.symbolic.rl
       set:
         - match: \s+
           scope: invalid.illegal
         - match: (<[->]|[<>?!])
           scope: string.symbolic.rl
-          pop: true
+          set: symbol-constant-template
         - match: '{{ident}}'
           scope: string.symbolic.rl
-          pop: true
+          set: symbol-constant-template
         - match: \S+
           scope: invalid.illegal
+  symbol-constant-template:
+    - match: \.
+      scope: string.symbolic.rl
+      set: [type-expression]
+    - match: (?=\S)
+      pop: true
   constructor:
     - include: constructor-open
     - match: (?=:)
@@ -1353,17 +1359,8 @@ contexts:
       set: [expression-after-operand, expression-symbol]
     - match: (?={{ident}})
       set: [expression-after-operand, expression-symbol]
-    - match: (:(?!:))
-      scope: string.symbolic.rl
-      set:
-        - match: \s+
-          scope: invalid.illegal
-        - match: (<[->]|[<>!?])
-          scope: string.symbolic.rl
-          set: expression-after-operand
-        - match: '{{ident}}'
-          scope: string.symbolic.rl
-          set: expression-after-operand
+    - match: (?=:(?!:))
+      set: [expression-after-operand, symbol-constant]
     - match: \S
       scope: invalid.illegal
   expression-tuple-after-value:
