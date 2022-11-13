@@ -496,6 +496,10 @@ contexts:
       set: [type-expression]
     - match: (?=\S)
       pop: true
+  expression-after-symbol-constant:
+    - include: symbol-constant
+    - match: (?=\S)
+      pop: true
   constructor:
     - include: constructor-open
     - match: (?=:)
@@ -1360,7 +1364,7 @@ contexts:
     - match: (?={{ident}})
       set: [expression-after-operand, expression-symbol]
     - match: (?=:(?!:))
-      set: [expression-after-operand, symbol-constant]
+      set: [expression-after-operand, expression-after-symbol-constant, symbol-constant]
     - match: \S
       scope: invalid.illegal
   expression-tuple-after-value:
