@@ -4,8 +4,6 @@
 name: RmbRT Language
 file_extensions:
   - rl
-  - rlh
-  - rld
 first_line_match: (\binclude\b.*|\(/(RL|rl)/\))
 scope: source.rl
 variables:
@@ -1329,6 +1327,9 @@ contexts:
         - include: expression
     - match: (\||\+[\+:]?|-[-:]?|~:?|!:?|\*|<-|&|\\|##)
       scope: keyword.operator.rl
+      set: expression
+    - match: \>\>
+      scope: keyword.rl
       set: expression
     - match: (\#\s*\??)\s*(\$)?|(\$)\s*(#\s*\??)?
       captures:
