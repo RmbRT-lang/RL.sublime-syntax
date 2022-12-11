@@ -996,21 +996,28 @@ contexts:
       scope: keyword.rl
       set:
       - match: \(
-        set: [type-qualifier, parenthese-close-pop, expression]
+        set: [after-type-expr, type-qualifier, parenthese-close-pop, expression]
     - match: \{
       scope: keyword
-      set: [tuple-type-after-first, type-expression]
+      set: [after-type-expr, tuple-type-after-first, type-expression]
     - match: \b(VOID|U?(INT|CHAR)|BOOL|[US][1248]|SINGLE|DOUBLE)\b
       scope: keyword.rl
-      set: type-qualifier
+      set: [after-type-expr, type-qualifier]
     - include: fn-signature
     - match: (?={{ident}}|\[|::(?!=))
-      set: type-expression-symbol
+      set: [after-type-expr, type-expression-symbol]
     - match: :\.
       scope: keyword.constant.rl
-      set: type-qualifier
+      set: [after-type-expr, type-qualifier]
     - match: (?=:(?!:))
-      set: [type-qualifier, symbol-constant]
+      set: [after-type-expr, type-qualifier, symbol-constant]
+  after-type-expr:
+    - include: comments
+    - match: \bOR\b
+      scope: keyword
+      set: type-expression
+    - match: (?=\S)
+      pop: true
   tuple-type-after-first:
     - match: \,
       set: [tuple-type-after-n, type-expression]
@@ -1205,7 +1212,7 @@ contexts:
   fn-signature-end:
     - match: \)
       scope: meta.function-call.rl
-      set: type-qualifier-step-indirection
+      set: [after-type-expr, type-qualifier-step-indirection]
     - match: \S
       scope: invalid.illegal
   type-qualifier:
