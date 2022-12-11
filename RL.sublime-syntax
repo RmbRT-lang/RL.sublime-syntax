@@ -491,11 +491,15 @@ contexts:
   symbol-constant-template:
     - match: \.
       scope: string.symbolic.rl
-      set: [type-expression]
-    - match: (?=\S)
-      pop: true
+      set: [expression-after-symbol-constant, type-expression]
+    - include: expression-after-symbol-constant
   expression-after-symbol-constant:
-    - include: symbol-constant
+    - match: (<[->]|[<>!]|\?(?!\?))
+      scope: string.symbolic.rl
+      set: symbol-constant-template
+    - match: '{{ident}}'
+      scope: string.symbolic.rl
+      set: symbol-constant-template
     - match: (?=\S)
       pop: true
   constructor:
