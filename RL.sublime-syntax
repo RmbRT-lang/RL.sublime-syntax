@@ -999,7 +999,7 @@ contexts:
         set: [after-type-expr, type-qualifier, parenthese-close-pop, expression]
     - match: \{
       scope: keyword
-      set: [after-type-expr, tuple-type-after-first, type-expression]
+      set: [after-type-expr, tuple-type-after-entry, type-expression]
     - match: \b(VOID|U?(INT|CHAR)|BOOL|[US][1248]|SINGLE|DOUBLE)\b
       scope: keyword.rl
       set: [after-type-expr, type-qualifier]
@@ -1018,10 +1018,9 @@ contexts:
       set: type-expression
     - match: (?=\S)
       pop: true
-  tuple-type-after-first:
+  tuple-type-after-entry:
     - match: \,
-      set: [tuple-type-after-n, type-expression]
-  tuple-type-after-n:
+      push: type-expression
     - match: \}
       scope: keyword
       set: type-qualifier
