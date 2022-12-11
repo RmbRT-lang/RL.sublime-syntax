@@ -1923,34 +1923,14 @@ contexts:
     - include: block-comment
     - include: line-comment
   block-comment:
-    - match: \(///
-      captures:
-        0: punctuation.definition.comment.c comment.block.c
-      push:
-        - meta_scope: comment.block.c
-        - match: /\)
-          scope: comment.block.c 
-          pop: true
-        - match: (?=.)
-          push:
-          - meta_scope: constant.numeric.rl
-          - match: (?=/\))
-            pop: true
-          - include: block-comment
     - match: \(//
-      captures:
-        0: punctuation.definition.comment.c comment.block.c
+      scope: string
       push:
-        - meta_scope: comment.block.c
+        - meta_scope: string
         - match: /\)
-          scope: comment.block.c 
+          scope: string
           pop: true
-        - match: (?=.)
-          push:
-          - meta_scope: string.quoted.double.rl
-          - match: (?=/\))
-            pop: true
-          - include: block-comment
+        - include: block-comment
     - match: \(/
       captures:
         0: punctuation.definition.comment.c
@@ -1962,20 +1942,9 @@ contexts:
     - match: /\).*$
       scope: invalid.illegal.stray-comment-end.c
   line-comment:
-    - match: ////(?!/)
+    - match: ///
       captures:
-        0: punctuation.definition.comment.c
-      push:
-        - meta_scope: constant.numeric.rl
-        - match: $\n?
-          pop: true
-        - match: \\\s*$(\s|\S)
-          push:
-          - match: \s|\S
-            pop: true
-    - match: ///(?!/)
-      captures:
-        0: punctuation.definition.comment.c
+        0: string
       push:
         - meta_scope: string.quoted.double.rl
         - match: $\n?
