@@ -992,6 +992,8 @@ contexts:
     - match: ','
   type-expression:
     - include: comments
+    - match: \b(OR)\b
+      scope: keyword
     - match: \b(TYPE)\b
       scope: keyword.rl
       set:
