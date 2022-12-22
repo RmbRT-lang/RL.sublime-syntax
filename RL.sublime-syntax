@@ -43,9 +43,11 @@ contexts:
       - match: (?=\S)
         push: global
   global:
+    - include: namespace
+    - include: global-no-namespace
+  global-no-namespace:
     - include: comments
     - include: test
-    - include: namespace
     - include: enum
     - include: templatedecl
     - include: struct
@@ -361,14 +363,6 @@ contexts:
         1: keyword
         2: keyword
       pop: true
-    - match: \b(STATIC)\b|#\s*\??
-      scope: keyword
-      set:
-        - match: \b(STATIC|\#\s*\??)\b
-          scope: invalid.illegal
-        - include: operator-overload
-        - include: function-or-possibly-auto-variable
-        - include: class-member
     - match: \b(PUBLIC|PROTECTED|PRIVATE)\b
       scope: keyword
       set: class-member-visible
@@ -440,19 +434,15 @@ contexts:
     - match: \S
       scope: invalid.illegal
   class-member-visible:
-    - match: \b(STATIC)\b|#\s*\??
+    - match: \b(STATIC)\b
+      scope: keyword
+      set: global-no-namespace
+    - match: (\#\s*\??)
       scope: keyword
       set:
-        - match: \b(STATIC)\b|\#\s*\??
-          scope: invalid.illegal
+        - include: comments
         - include: operator-overload
-        - include: function-or-possibly-auto-variable
-        - include: class-member-visible
-    - match: \b(VIRTUAL|ABSTRACT|OVERRIDE|FINAL)\b
-      scope: keyword
-      set:
         - include: member-function-or-variable
-        - include: operator-overload
     - include: comments
     - include: enum
     - include: union
@@ -685,16 +675,27 @@ contexts:
       captures:
         1: constant.numeric.rl
       set: [semicolon-close, variable-initialiser, type-expression]
-  member-function-or-variable:
+  member-function:
+    - match: \b(VIRTUAL|ABSTRACT|OVERRIDE|FINAL)\b
+      scope: keyword
+      set:
+        - match: '({{ident}})\s*(\()'
+          captures:
+            1: entity.name.function.rl
+            2: meta.function-call.c
+          set: [function-meta, function-after-head, function-arguments]
+        - include: operator-overload
     - match: '({{ident}})\s*(\()'
       captures:
         1: entity.name.function.rl
         2: meta.function-call.c
       set: [function-meta, function-after-head, function-arguments]
+  member-function-or-variable:
+    - include: member-function
     - match: '({{ident}})\s*(:)(?![:=])'
       captures:
         1: variable.other.readwrite.member.rl
-      set: [semicolon-close, variable-initialiser, type-expression]
+      set: [semicolon-close, type-expression]
     - match: (?={{ident}}\s*(::|;|\#|\$|\*|&|\\))
       set: [semicolon-close, type-expression]
   function-or-possibly-auto-variable:
