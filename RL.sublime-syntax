@@ -1383,6 +1383,9 @@ contexts:
   expression-tuple-after-value:
     - match: \,
       push: expression
+    - match: \;
+      scope: keyword.operator.rl
+      push: expression
     - include: expression-pop-parenthese
   expression-close-dynamic-cast-bracket:
     - match: \>\>
@@ -1515,8 +1518,16 @@ contexts:
       set: expression-post-operator
     - include: comments
     - include: expression-post-operator
+  inline-fn-call-after-arg:
+    - match: \,
+      push: expression
+    - match: (?=\S)
+      set: expression-after-operand
   ctor-call-after-arg:
     - match: \,
+      push: expression
+    - match: \;
+      scope: keyword.operator.rl
       push: expression
     - match: \}
       scope: keyword.rl
@@ -1526,6 +1537,9 @@ contexts:
       scope: keyword.operator.rl
     - match: (<>|<<<?=?|>>>?=?|\|\||&&|[-^+*/&%|<>]=?|[!:=]=)
       scope: keyword.operator.rl
+      set: expression
+    - match: \b(AND)\b
+      scope: keyword.rl
       set: expression
     - match: \!
       scope: keyword.rl
@@ -1561,6 +1575,9 @@ contexts:
       scope: meta.function-call.c
       set: expression-after-operand
     - match: \,
+      push: expression
+    - match: \;
+      scope: keyword.operator.rl
       push: expression
   expression-ternary-colon:
     - include: comments
