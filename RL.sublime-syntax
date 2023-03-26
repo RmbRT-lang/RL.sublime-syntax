@@ -168,12 +168,11 @@ contexts:
           set: blockstatement
   namespace:
     - match: (?=::)
-      scope: keyword.control.rl
       set: namespace_name
   namespace_name:
     - meta_scope: entity.name.namespace.rl 
     - match: "::"
-      scope: keyword
+      scope: meta.namespace.rl
       push:
       - match: '{{ident}}'
         scope: meta.namespace.rl
@@ -1188,13 +1187,13 @@ contexts:
   type-expression-after-name:
     - include: comments
     - match: '::'
-      scope: meta.function-call.rl
+      scope: meta.namespace.rl
       set: type-expression-symbol
     - include: type-qualifier
   expression-after-name:
     - include: comments
     - match: '::'
-      scope: meta.function-call.rl
+      scope: meta.namespace.rl
       set: expression-symbol
     - match: (?=\S)
       pop: true
