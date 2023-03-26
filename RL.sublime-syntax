@@ -130,6 +130,9 @@ contexts:
       scope: storage.type.name
       pop: true
   value-identifier:
+    - match: \b(SIMD|IOTA)\b
+      scope: constant.numeric.rl keyword.rl
+      pop: true
     - match: '{{lowercase_ident}}(?=\s*::(?!=))'
       scope: meta.namespace.rl
       pop: true
@@ -1600,6 +1603,7 @@ contexts:
       scope: invalid.illegal
   statement:
     - include: comments
+    - include: simdstatement
     - include: blockstatement
     - include: wait-or-sleep
     - include: if
@@ -1631,6 +1635,22 @@ contexts:
       - include: while
       - include: for
       - include: try
+  simdstatement:
+    - match: '\|\|(?=\s*{)'
+      scope: keyword.control.rl
+      set:
+      - match: \{
+        scope: open.curly.bracket.block.rl
+        set:
+        - match: \?
+          scope: keyword.rl
+          set: simdstatement-after-parallel
+        - match: (?=\S)
+          set: [simdstatement-after-parallel, expression]
+  simdstatement-after-parallel:
+    - match: '}'
+      scope: close.curly.bracket.block.rl
+      set: statement
   blockstatement:
     - match: '{'
       scope: open.curly.bracket.block.rl
@@ -1854,7 +1874,12 @@ contexts:
   for:
     - match: \b(FOR)\b
       scope: keyword.control.rl
-      set: [for-after-label, control-label]
+      set:
+      - match: \|\|
+        scope: keyword.control.rl
+        set: [for-after-label, control-label]
+      - match: (?=\S)
+        set: [for-after-label, control-label]
   for-after-label:
       - match: \(
         set: [statement, for-init-term]
