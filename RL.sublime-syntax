@@ -1288,6 +1288,9 @@ contexts:
   expression-or-ambiguous-statement-expression:
     - include: ambiguous-statement-expression
     - include: expression
+  copy_rtti_after_src:
+    - match: \,
+      set: [expression-pop-parenthese, expression]
   expression:
     - include: comments
     - include: string
@@ -1296,6 +1299,11 @@ contexts:
     - match: \b(TRUE|FALSE|NULL|BARE)\b
       scope: constant.language.rl
       set: expression-after-operand
+    - match: \b(COPY_RTTI)\b
+      scope: keyword
+      set:
+        - match: \(
+          set: [copy_rtti_after_src, expression]
     - match: \b(TYPE)\b
       scope: keyword
       set:
@@ -1489,8 +1497,10 @@ contexts:
       - match: \~
         scope: keyword.rl
         set: expression-after-operand
-      - match: \{
-        scope: keyword.rl
+      - match: (VIRTUAL)?\s*(\{)
+        captures:
+          1: keyword.rl
+          2: keyword.rl
         set:
           - match: \}
             scope: keyword.rl
