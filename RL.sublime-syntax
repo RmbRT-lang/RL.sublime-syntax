@@ -140,7 +140,7 @@ contexts:
       scope: storage.type.name.rl
       pop: true
     - match: '{{ident}}(?=\s*(\(|\bVISIT\b))'
-      scope: meta.function-call.rl
+      scope: meta.function-call.rl variable.function.rl
       pop: true
     - match: '(?<=::){{lowercase_ident}}(?!\s*::(?!=))'
       scope: constant.other.variable.rl
@@ -1522,7 +1522,7 @@ contexts:
         scope: variable.other.readwrite.member.rl
         set: expression-after-operand
       - match: \b([a-zA-Z_][a-zA-Z0-9_]*)\b(?=\s*(\(|\bVISIT\b))
-        scope: meta.function-call.c
+        scope: meta.function-call.c variable.function.member.rl
         set: expression-after-operand
       - match: \S
         scope: invalid.illegal
