@@ -1360,6 +1360,11 @@ contexts:
         2: keyword.rl
         3: keyword.rl
         4: keyword.rl
+    - match: (>)
+      scope: keyword
+      set:
+        - match: \(
+          set: [expression-pop-parenthese, type-expression-symbol-root]
     - match: \(
       set: [expression-tuple-after-value, expression-or-ambiguous-statement-expression]
     - match: (?=\[)
