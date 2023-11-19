@@ -1175,12 +1175,12 @@ contexts:
         scope: invalid.illegal
       - match: \#
         scope: constant.numeric.rl
-        set: [type-expression-template-comma-or-bracketclose, expression-list-commas-after-expression, expression]
+        set: [expression-template-comma-or-bracketclose, expression-list-commas-after-expression, expression]
       - match: \;
         scope: keyword
-        set: type-expression-template-comma-or-bracketclose
+        set: expression-template-comma-or-bracketclose
       - match: (?=\S)
-        set: [type-expression-template-comma-or-bracketclose, type-list-commas-after-type, type-expression]
+        set: [expression-template-comma-or-bracketclose, type-list-commas-after-type, type-expression]
     - match: \]
       scope: meta.function-call.c
       set: [expression-after-name, value-identifier]
