@@ -1244,10 +1244,10 @@ contexts:
         - include: type-qualifier-step-atomic
     - include: type-qualifier-step-atomic
   type-qualifier-step-atomic:
-    - match: \.
+    - match: \.(?!\.\.)
       scope: keyword.rl
       set:
-        - match: \.
+        - match: \.(?!\.\.)
           scope: invalid.illegal.rl
         - match: (?=\S)
           set: type-qualifier-step-indirection
