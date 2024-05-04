@@ -1640,16 +1640,22 @@ contexts:
       scope: invalid.illegal
   unambiguous-statement-expression:
       - include: comments
-      - include: blockstatement
-      - include: type-switch
-      - include: switch
-      - include: do-loop
+      - match: ->
+        scope: keyword
+        set:
+        - include: blockstatement
+        - include: type-switch
+        - include: switch
+        - include: do-loop
   ambiguous-statement-expression:
       - include: comments
-      - include: if
-      - include: while
-      - include: for
-      - include: try
+      - match: ->
+        scope: keyword
+        set:
+        - include: if
+        - include: while
+        - include: for
+        - include: try
   simdstatement:
     - match: '\|\|(?=\s*{)'
       scope: keyword.control.rl
