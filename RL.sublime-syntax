@@ -459,7 +459,7 @@ contexts:
     - match: \b(DESTRUCTOR)\b
       scope: keyword.rl
       set:
-      - match: \b(INLINE)\b
+      - match: \b(INLINE)\b|--
         scope: keyword.rl
         set:
           - include: blockstatement
@@ -543,7 +543,7 @@ contexts:
     - match: \S
       scope: invalid.illegal
   constructor-after-arguments:
-    - match: \b(INLINE)\b
+    - match: \b(INLINE)\b|--
       scope: keyword.rl
       set: constructor-member
     - include: constructor-member
@@ -826,7 +826,7 @@ contexts:
     - match: (?=\S)
       pop: true
   function-inline:
-    - match: \b(INLINE)\b
+    - match: \b(INLINE)\b|--
       scope: keyword.rl
       pop: true
     - match: (?=\S)
@@ -849,7 +849,7 @@ contexts:
       set: function-after-head-cast-after-async
     - include: function-after-head-cast-after-async
   function-after-head-cast-after-async:
-    - match: \b(INLINE)\b
+    - match: \b(INLINE)\b|--
       scope: keyword.rl
       set: function-cast-body
     - include: function-cast-body
@@ -1280,7 +1280,7 @@ contexts:
       pop: true
     - include: type-infix-template
   type-infix-template:
-    - match: (\-)
+    - match: (\-(?!-))
       scope: constant.numeric.rl
       set: type-expression-symbol
     - match: (?=\S)
