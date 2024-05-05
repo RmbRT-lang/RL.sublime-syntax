@@ -1348,11 +1348,6 @@ contexts:
         - match: \.{2}[!?]
           scope: invalid.illegal
         - include: expression
-    - match: (\-\>)
-      scope: keyword
-      set:
-        - match: \(
-          set: [expression-pop-parenthese, type-expression-symbol-root]
     - match: (\||\+[\+:]?|-[-:]?|~:?|!:?|\*|<-|&|\\|##)
       scope: keyword.operator.rl
       set: expression
@@ -1647,6 +1642,8 @@ contexts:
         - include: type-switch
         - include: switch
         - include: do-loop
+        - match: \(
+          set: [expression-pop-parenthese, type-expression-symbol-root]
   ambiguous-statement-expression:
       - include: comments
       - match: ->
