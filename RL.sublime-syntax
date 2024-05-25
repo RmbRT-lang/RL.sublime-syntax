@@ -1789,7 +1789,12 @@ contexts:
   switch-body:
     - match: \{
       scope: open.curly.bracket.block.rl
-      set: case
+      set: common-case
+  common-case:
+    - match: \b(COMMON)\b
+      scope: keyword.control.rl
+      set: case-end
+    - include: case
   case:
     - match: \b(DEFAULT)\b
       scope: keyword.control.rl
