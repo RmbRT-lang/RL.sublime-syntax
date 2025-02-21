@@ -207,6 +207,8 @@ contexts:
           - include: enum-member-constant
   enum-member-constant:
     - include: comments
+    - match: \b(DEFAULT)\b|\*
+      scope: keyword.rl
     - match: '{{ident}}'
       scope: entity.name.function.rl constant.numeric.rl
       set:
