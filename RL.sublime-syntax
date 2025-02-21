@@ -370,7 +370,7 @@ contexts:
       set: class-member-visible
     - include: class-member-visible
   operator-overload:
-    - match: (\*|--?|\||\+\+?|~|!|&|\.\.[?!]|@@?|<-|##?)
+    - match: (\*|--?|\||\+\+?|~|!|&|\.\.[?!]|@@?|<-|##?|\b(BSWAP)\b|\b(POPCNT)\b)
       scope: keyword.operator.rl
       set:
         - match: \b(THIS)\b
@@ -486,14 +486,23 @@ contexts:
       set: [expression-after-symbol-constant, type-expression]
     - include: expression-after-symbol-constant
   expression-after-symbol-constant:
-    - match: (<[->]|[<>!]|\?(?!\?))
-      scope: string.symbolic.rl
-      set: symbol-constant-template
-    - match: '{{ident}}'
-      scope: string.symbolic.rl
-      set: symbol-constant-template
-    - match: (?=\S)
+    - match: "-"
+      scope: constant.numeric.rl
+      set:
+      - match: (<[->]|[<>!]|\?(?!\?))
+        scope: string.symbolic.rl
+        set: symbol-constant-template
+      - match: '{{ident}}'
+        scope: string.symbolic.rl
+        set: symbol-constant-template
+      - match: (?=[,;:()\[\]{}])
+        pop: true
+      - match: (?=\s)
+        set: expression
+    - match: (?=[,;:()\[\]{}]|\?\?)
       pop: true
+    - match: (?=\S)
+      set: expression
   constructor:
     - include: constructor-open
     - match: (?=:)
@@ -1348,7 +1357,7 @@ contexts:
         - match: \.{2}[!?]
           scope: invalid.illegal
         - include: expression
-    - match: (\||\+[\+:]?|-[-:]?|~:?|!:?|\*|<-|&|\\|##)
+    - match: (\||\+[\+:]?|-[-:]?|~:?|!:?|\*|<-|&|\\|##|\b(BSWAP)\b|\b(POPCNT)\b)
       scope: keyword.operator.rl
       set: expression
     - match: \>\>
