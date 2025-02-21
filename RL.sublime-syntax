@@ -1362,7 +1362,7 @@ contexts:
     - match: (\||\+[\+:]?|-[-:]?|~:?|!:?|\*|<-|&|\\|##|\b(BSWAP)\b|\b(POPCNT)\b)
       scope: keyword.operator.rl
       set: expression
-    - match: \>\>
+    - match: \>\>?\>?
       scope: keyword.rl
       set: expression
     - match: (\#\s*\??)\s*(\$)?|(\$)\s*(#\s*\??)?
