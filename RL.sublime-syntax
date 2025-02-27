@@ -1018,7 +1018,7 @@ contexts:
     - match: \{
       scope: keyword
       set: [after-type-expr, tuple-type-after-entry, type-expression]
-    - match: \b(VOID|U?(INT|CHAR)|BOOL|[US][1248]|SINGLE|DOUBLE)\b
+    - match: \b(VOID|U?(INT|CHAR)|BOOL|[US][1248]|RAW|SINGLE|DOUBLE)\b
       scope: keyword.rl
       set: [after-type-expr, type-qualifier]
     - include: fn-signature
@@ -1389,7 +1389,7 @@ contexts:
     - match: \b(0([xX][0-9a-fA-F]+\.[0-9a-fA-F]*|[0-7]+\.[0-7]*)|(0|[1-9][0-9]*)\.[0-9]*)(['_][hsdqHSDQ])?\b
       scope: constant.numeric.rl
       set: expression-after-operand
-    - match: \b(0([xX][0-9a-fA-F]+|[0-7]+|[bB][01]+)|0|[1-9][0-9]*)\b
+    - match: \b(0([rR]([0-9a-fA-F]{16}|[0-9a-fA-F]{8}|[0-9a-fA-F]{4}|[0-9a-fA-F]{2})|[xX][0-9a-fA-F]+|[0-7]+|[bB][01]+)|0|[1-9][0-9]*)\b
       scope: constant.numeric.rl
       set: expression-after-operand
     - match: \b(THIS)\b
