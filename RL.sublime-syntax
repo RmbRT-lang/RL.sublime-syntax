@@ -1068,7 +1068,7 @@ contexts:
       scope: meta.namespace.rl
       set: type-expression-symbol-root
   type-expression-symbol-root:
-    - match: \b(THIS|NULL)\b
+    - match: \b(THIS|NULL|WHERE)\b
       scope: keyword.rl
       set: type-expression-after-name
     - match: '{{lowercase_ident}}(?=::)'
@@ -1309,7 +1309,7 @@ contexts:
     - include: string
     - include: char
     - include: unambiguous-statement-expression
-    - match: \b(TRUE|FALSE|NULL|BARE)\b
+    - match: \b(TRUE|FALSE|NULL|BARE|HERE)\b
       scope: constant.language.rl
       set: expression-after-operand
     - match: \b(COPY_RTTI)\b
