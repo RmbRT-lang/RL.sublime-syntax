@@ -84,6 +84,7 @@ contexts:
       - match: \S
         scope: invalid.illegal
   templatedecl-inner-after-name:
+      - include: templatedecl-close-or-comma
       - match: ':'
         scope: keyword.operator.rl
         set:
