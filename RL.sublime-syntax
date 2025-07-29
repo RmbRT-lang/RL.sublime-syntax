@@ -1019,7 +1019,7 @@ contexts:
     - match: \{
       scope: keyword
       set: [after-type-expr, tuple-type-after-entry, type-expression]
-    - match: \b(VOID|U?(INT|CHAR)|BOOL|[US][1248]|RAW|SINGLE|DOUBLE)\b
+    - match: \b(VOID|U?(INT|CHAR)|BOOL|[US][1248M]|RAW|SINGLE|DOUBLE)\b
       scope: keyword.rl
       set: [after-type-expr, type-qualifier]
     - include: fn-signature
