@@ -347,6 +347,7 @@ contexts:
     - match: (?=\S)
       set: [class-after-inheritance, type-expression-symbol]
   class-after-inheritance:
+    - include: comments
     - match: ","
       set: class-inheritance
     - match: (?=\S)
