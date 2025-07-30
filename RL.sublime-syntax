@@ -1593,7 +1593,7 @@ contexts:
           set: [expression-pop-bracket, expression]
         - match: \#(?=\s*\])
           scope: keyword.operator.rl
-          set: [expression-pop-bracket, expression]
+          set: [expression-pop-bracket]
         - match: (?=\])
           set: expression-pop-bracket
         - match: (?=\S)
