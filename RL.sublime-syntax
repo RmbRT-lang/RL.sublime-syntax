@@ -131,7 +131,7 @@ contexts:
       scope: storage.type.name
       pop: true
   value-identifier:
-    - match: \b(SIMD|IOTA)\b
+    - match: \b(SIMD|IOTA|IT|ITER)\b
       scope: constant.numeric.rl keyword.rl
       pop: true
     - match: '{{lowercase_ident}}(?=\s*::(?!=))'
