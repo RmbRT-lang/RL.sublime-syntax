@@ -385,7 +385,7 @@ contexts:
         2: keyword
       pop: true
     - match: \b(PUBLIC|PROTECTED|PRIVATE)\b
-      scope: keyword
+      scope: keyword.rl
       set: class-member-visible
     - include: class-member-visible
   operator-overload:
@@ -458,6 +458,9 @@ contexts:
     - match: \b(STATIC)\b
       scope: keyword
       set: global-no-namespace
+    - match: \b(DEFAULT)\b|\*
+      scope: keyword.rl
+      set: member-function-or-variable
     - match: (\#\s*\??)
       scope: keyword
       set:
@@ -1025,6 +1028,11 @@ contexts:
   arg-comma-or-close:
     - match: ','
   type-expression:
+    - match: \b(ENUM|TAGGED)\b
+      scope: keyword.rl
+      set: type-expression-2
+    - include: type-expression-2
+  type-expression-2:
     - include: comments
     - match: \b(OR)\b
       scope: keyword
