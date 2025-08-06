@@ -57,9 +57,22 @@ contexts:
     - include: external-symbol
     - include: union
     - include: concept
+    - include: export
     - include: class
     - match: \S
       scope: invalid.illegal
+  export:
+    - match: \b(EXPORT)\b
+      scope: keyword.rl
+      set:
+      - match: \[
+        set:
+        - match: "{{ident}}"
+          scope: entity.name.linkname.rl string.linkname.rl
+          set:
+          - match: \]
+            set: function-or-variable
+      - include: function-or-variable
   templatedecl:
     - match: \[
       scope: keyword.operator.rl
@@ -653,7 +666,10 @@ contexts:
       scope: keyword.rl
       set:
       - match: \[
-        set: [external-symbol-after-string, string]
+        set:
+        - match: '{{ident}}'
+          scope: string.linkname.rl
+          set: external-symbol-after-string
       - match: (?=\S)
         set: external-symbol-name
   external-symbol-after-string:
