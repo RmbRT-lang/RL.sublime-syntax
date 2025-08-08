@@ -221,7 +221,7 @@ contexts:
           - include: enum-member-constant
   enum-member-constant:
     - include: comments
-    - match: \b(DEFAULT)\b|\*
+    - match: \b(DEFAULT)\b|[*!?]
       scope: keyword.rl
     - match: '{{ident}}'
       scope: entity.name.function.rl constant.numeric.rl
@@ -232,6 +232,23 @@ contexts:
       - include: enum-member-after-constant
   enum-member-after-constant:
     - include: comments
+    - match: '@'
+      scope: string.tag.rl
+      set:
+      - match: '{{ident}}'
+        scope: string.tag.rl
+        set:
+        - match: \(
+          scope: meta.function-call.rl
+          set:
+          - match: \)
+            scope: meta.function-call.rl
+            set: enum-member-after-constant
+          - match: ','
+          - match: (?=\S)
+            push: expression
+        - match: (?=\S)
+          set: enum-member-after-constant
     - match: \,
       set: enum-member-constant
     - match: \}
@@ -458,7 +475,7 @@ contexts:
     - match: \b(STATIC)\b
       scope: keyword
       set: global-no-namespace
-    - match: \b(DEFAULT)\b|\*
+    - match: ((\bDEFAULT\b|[*!?])\s*)+(?!\s*\bTHIS\b)
       scope: keyword.rl
       set: member-function-or-variable
     - match: (\#\s*\??)
@@ -727,6 +744,29 @@ contexts:
         2: meta.function-call.c
       set: [function-meta, function-after-head, function-arguments]
   member-function-or-variable:
+    - match: ({{ident}})(?=\s*[\;\@]) # Named symbolic variable (Name: :Name;)
+      scope: variable.other.readwrite.member.rl string.symbolic.rl
+      set:
+      - include: semicolon-close
+      - match: '@'
+        scope: string.tag.rl
+        push:
+        - match: '{{ident}}'
+          scope: string.tag.rl
+          set:
+          - include: semicolon-close
+          - match: \(
+            scope: meta.function-call.rl
+            set:
+            - match: \)
+              scope: meta.function-call.rl
+              pop: true
+            - match: ','
+            - match: (?=\S)
+              push: expression
+        - match: \S\s*$
+          scope: invalid.illegal.rl
+          pop: true
     - include: member-function
     - match: '({{ident}})\s*(:)(?![:=])'
       captures:
