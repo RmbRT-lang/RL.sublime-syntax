@@ -365,7 +365,7 @@ contexts:
       - include: class-body
   class-inheritance:
     - match: \b(VIRTUAL)\b
-      scope: keyword
+      scope: invalid.illegal.rl
       set: class-inheritance-visibility
     - include: class-inheritance-visibility
   class-inheritance-visibility:
@@ -383,6 +383,8 @@ contexts:
     - match: (?=\S)
       set: class-body
   class-body:
+    - include: comments
+    - include: semicolon-close-noerr
     - match: "{"
       scope: open.curly.bracket.block.rl
       set:
