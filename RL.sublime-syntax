@@ -1352,7 +1352,10 @@ contexts:
     - include: type-qualifier-array-close
   type-qualifier-array-close:
     - match: \]
-      set: type-qualifier-step-indirection
+      set:
+      - match: "#"
+        scope: storage.modifier.qualifier.rl
+      - include: type-qualifier-step-indirection
   type-reference:
     - match: (&&?)
       scope: storage.modifier.rl
