@@ -1893,7 +1893,7 @@ contexts:
       scope: keyword.control.rl
       set: [if-condition, control-label, if-maybe-expose-variable]
   if-maybe-expose-variable:
-    - match: ":"
+    - match: "[:#]"
       scope: keyword.rl
     - match: (?=\S)
       pop: true
