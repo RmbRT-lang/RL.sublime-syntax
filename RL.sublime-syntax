@@ -1410,6 +1410,9 @@ contexts:
     - match: \[
       set:
         - include: type-qualifier-array-close
+        - match: \b(TABLE)\b
+          scope: keyword
+          set: [type-qualifier-array-close, type-expression]
         - match: ([#?])(?=\s*\])
           scope: keyword
           set: type-qualifier-array-close
