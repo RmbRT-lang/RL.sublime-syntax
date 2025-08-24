@@ -87,6 +87,12 @@ contexts:
       pop: true
     - include: templatedecl-inner
   templatedecl-inner:
+      - match: \#
+        scope: keyword
+        set:
+        - match: \b{{ident}}\b
+          scope: string.template.rl
+          set: templatedecl-close-or-comma
       - match: \b{{ident}}\b
         scope: string.template.rl
         set:
