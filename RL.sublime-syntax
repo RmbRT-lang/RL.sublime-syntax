@@ -1171,6 +1171,39 @@ contexts:
         set: type-expression-template-comma-or-bracketclose
       - match: (?=\S)
         set: [type-expression-template-comma-or-bracketclose, type-list-commas-after-type, type-expression]
+  type-expression-symbol-plain:
+    - match: (::)
+      scope: meta.namespace.rl
+      set: type-expression-symbol-plain-root
+    - match: \b(THIS)\b
+      scope: keyword.rl
+      set: type-expression-after-name
+    - include: type-expression-symbol-plain-root
+  type-expression-symbol-plain-root:
+    - match: '{{lowercase_ident}}(?=::)'
+      scope: meta.namespace.rl
+      set: type-expression-plain-after-name
+    - match: '{{uppercase_ident}}(?=::)'
+      scope: storage.type.name.rl
+      set: type-expression-plain-after-name
+    - match: '{{ident}}(?!::)'
+      scope: storage.type.name.rl
+      set: type-expression-plain-after-name
+    - match: \[
+      scope: meta.function-call.c
+      set:
+      - include: comments
+      - match: \]
+        scope: meta.function-call.c
+        set: [type-expression-plain-after-name, type-identifier]
+      - match: \#
+        scope: constant.numeric.rl
+        set: [type-expression-plain-template-comma-or-bracketclose, expression-list-commas-after-expression, expression]
+      - match: \;
+        scope: keyword
+        set: type-expression-plain-template-comma-or-bracketclose
+      - match: (?=\S)
+        set: [type-expression-plain-template-comma-or-bracketclose, type-list-commas-after-type, type-expression]
   expression-symbol:
     - include: comments
     - match: (?={{ident}})
@@ -1242,6 +1275,28 @@ contexts:
     - match: \S+
       scope: invalid.illegal
       pop: true
+  type-expression-plain-template-comma-or-bracketclose:
+    - include: comments
+    - match: \;
+      scope: keyword
+      set:
+      - include: comments
+      - match: \]
+        scope: invalid.illegal
+      - match: \#
+        scope: constant.numeric.rl
+        set: [type-expression-plain-template-comma-or-bracketclose, expression-list-commas-after-expression, expression]
+      - match: \;
+        scope: keyword
+        set: type-expression-plain-template-comma-or-bracketclose
+      - match: (?=\S)
+        set: [type-expression-plain-template-comma-or-bracketclose, type-list-commas-after-type, type-expression]
+    - match: \]
+      scope: meta.function-call.c
+      set: [type-expression-plain-after-name, type-identifier]
+    - match: \S+
+      scope: invalid.illegal
+      pop: true
   expression-list-commas-after-expression:
     - include: comments
     - match: \,
@@ -1282,6 +1337,13 @@ contexts:
       scope: meta.namespace.rl
       set: type-expression-symbol
     - include: type-qualifier
+  type-expression-plain-after-name:
+    - include: comments
+    - match: '::'
+      scope: meta.namespace.rl
+      set: type-expression-symbol-plain
+    - match: (?=\S)
+      pop: true
   expression-after-name:
     - include: comments
     - match: '::'
