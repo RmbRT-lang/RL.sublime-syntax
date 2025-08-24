@@ -1383,6 +1383,12 @@ contexts:
     - include: string
     - include: char
     - include: unambiguous-statement-expression
+    - match: \b(RANDOM)\b
+      scope: keyword.rl
+      set: type-expression
+    - match: \b(NOW|CPU_COUNTER)\b
+      scope: keyword.rl
+      pop: true
     - match: \b(TRUE|FALSE|NULL|BARE|HERE)\b
       scope: constant.language.rl
       set: expression-after-operand
