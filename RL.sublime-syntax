@@ -1649,6 +1649,10 @@ contexts:
     - match: \b(VISIT)\b
       scope: keyword.rl
       set:
+        - match: \*
+          scope: keyword.operator.rl
+        - match: (>>)
+          scope: keyword.operator.rl
         - match: \(
           scope: meta.function-call.c
           set:
