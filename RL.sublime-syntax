@@ -1499,7 +1499,7 @@ contexts:
               set: [expression-pop-parenthese, type-expression]
     - match: "###"
       scope: keyword.operator.rl
-      set: type-expression-symbol-root
+      set: [expression-after-operand, type-expression-symbol-plain-root]
     - match: \.{2}[!?]
       scope: keyword.rl
       set:
