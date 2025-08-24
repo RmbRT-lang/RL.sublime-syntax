@@ -729,7 +729,15 @@ contexts:
     - match: '({{ident}})\s*(:)(?![:=])'
       captures:
         1: constant.numeric.rl
-      set: [semicolon-close, variable-initialiser, type-expression]
+      set: [semicolon-close, variable-initialiser, type-expression, alignment-or-nothing]
+  alignment-or-nothing:
+    - match: '@'
+      scope: keyword.rl
+      set:
+        - match: \(
+          set: [expression-pop-parenthese, expression]
+    - match: (?=\S)
+      pop: true
   member-function:
     - match: \b(VIRTUAL|ABSTRACT|OVERRIDE|FINAL)\b
       scope: keyword
@@ -773,7 +781,7 @@ contexts:
     - match: '({{ident}})\s*(:)(?![:=])'
       captures:
         1: variable.other.readwrite.member.rl
-      set: [semicolon-close, type-expression]
+      set: [semicolon-close, type-expression, alignment-or-nothing]
     - match: (?={{ident}}\s*(::|;|\#|\$|\*|&|\\))
       set: [semicolon-close, type-expression]
   function-or-possibly-auto-variable:
