@@ -408,7 +408,7 @@ contexts:
       set: class-member-visible
     - include: class-member-visible
   operator-overload:
-    - match: (\*|--?|\||\+\+?|~|!|&|\.\.[?!]|@@?|<-|##?|\b(BSWAP)\b|\b(POPCNT)\b)
+    - match: (\*|--?|\||\+\+?|~|!|&|\.\.[?!]|@@?|<-|##?|\b(BSWAP|POPCNT)\b)
       scope: keyword.operator.rl
       set:
         - match: \b(THIS)\b
@@ -1435,7 +1435,7 @@ contexts:
         - match: \.{2}[!?]
           scope: invalid.illegal
         - include: expression
-    - match: (\||\+[\+:]?|-[-:]?|~:?|!:?|\*|<-|&|\\|##|\b(BSWAP)\b|\b(POPCNT)\b)
+    - match: (\||\+[\+:]?|-[-:]?|~:?|!:?|\*|<-|&|\\|##|\b(BSWAP|POPCNT|FIRST[01](BIT|POS)|PREFETCH(_READ|_WRITE|_CODE)?)\b)
       scope: keyword.operator.rl
       set: expression
     - match: \>\>?\>?
