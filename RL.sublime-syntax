@@ -150,7 +150,7 @@ contexts:
       scope: storage.type.name
       pop: true
   value-identifier:
-    - match: \b(SIMD|IOTA|IT|ITER)\b
+    - match: \b(RANGE|IOTA|IT|ITER|SIMD|CACHELINE|PAGE)\b
       scope: constant.numeric.rl keyword.rl
       pop: true
     - match: '{{lowercase_ident}}(?=\s*::(?!=))'
