@@ -1848,7 +1848,7 @@ contexts:
         - include: for
         - include: try
   simdstatement:
-    - match: '\|\|(?=\s*{)'
+    - match: '\|\|\|(?=\s*{)'
       scope: keyword.control.rl
       set:
       - match: \{
