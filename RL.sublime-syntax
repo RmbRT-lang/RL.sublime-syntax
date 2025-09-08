@@ -88,7 +88,7 @@ contexts:
     - include: templatedecl-inner
   templatedecl-inner:
       - match: \#
-        scope: keyword
+        scope: constant.numeric.rl
         set:
         - match: \b{{ident}}\b
           scope: string.template.rl
