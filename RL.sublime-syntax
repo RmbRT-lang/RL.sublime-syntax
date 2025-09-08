@@ -863,9 +863,9 @@ contexts:
     - match: '({{ident}})\s*:(?!:)'
       captures:
         1: constant.numeric.rl
-      set: [function-arg-default-init, type-expression]
+      set: [function-arg-default-init, type-expression, alignment-or-nothing]
     - match: (?=\[|{{ident}}|:(?!:)|\{)
-      set: [function-arg-default-init, type-expression]
+      set: [function-arg-default-init, type-expression, alignment-or-nothing]
   function-arg-default-init:
     - include: comments
     - match: :=
