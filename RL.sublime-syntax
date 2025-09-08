@@ -1084,11 +1084,16 @@ contexts:
   arg-comma-or-close:
     - match: ','
   type-expression:
-    - match: \b(ENUM|TAGGED)\b
+    - match: \b(FLAGS)\b
       scope: keyword.rl
       set: type-expression-2
     - include: type-expression-2
   type-expression-2:
+    - match: \b(ENUM|TAGGED)\b
+      scope: keyword.rl
+      set: type-expression-3
+    - include: type-expression-3
+  type-expression-3:
     - include: comments
     - match: \b(OR)\b
       scope: keyword
