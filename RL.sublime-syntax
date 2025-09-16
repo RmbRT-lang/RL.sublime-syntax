@@ -1011,7 +1011,9 @@ contexts:
       captures:
         1: keyword.operator.rl
       set: [variable-initialiser, type-expression]
-    - match: '{{ident}}\s*(?=#|\$|::=)'
+    - match: '({{ident}})\s*(?=#(?!#)|\$|::=)'
+      captures:
+        1: constant.numeric.rl
       set:
       - match: (#\s*\??)
         scope: keyword
