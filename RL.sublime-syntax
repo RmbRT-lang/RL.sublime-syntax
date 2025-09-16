@@ -1389,7 +1389,11 @@ contexts:
   type-qualifier-step-nodecay:
     - match: \!?\s*\+?
       scope: keyword.rl
-      set: type-qualifier-step-qualifier
+      set: type-qualifier-step-alignment
+    - include: type-qualifier-step-alignment
+  type-qualifier-step-alignment:
+    - match: (?=@)
+      set: [type-qualifier-step-qualifier, alignment-or-nothing]
     - include: type-qualifier-step-qualifier
   type-qualifier-step-qualifier:
     - match: \#\s*\??
@@ -1426,12 +1430,24 @@ contexts:
         - match: \b(TABLE)\b
           scope: keyword
           set: [type-qualifier-array-close, type-expression]
+        - match: (#)\s*\,
+          captures:
+            1: keyword.rl
+          set: [expression-pop-bracket, ptr-alignment]
         - match: ([#?])(?=\s*\])
           scope: keyword
           set: type-qualifier-array-close
         - match: (?=\S)
           set: [type-qualifier-array-after-dimension, expression]
     - include: type-reference
+  ptr-alignment:
+    - match: (?=\S)
+      set: [ptr-after-alignment, expression]
+  ptr-after-alignment:
+    - match: \,
+      set: expression
+    - match: (?=\S)
+      pop: true
   type-qualifier-array-after-dimension:
     - match: \,
       set: [type-qualifier-array-after-dimension, expression]
