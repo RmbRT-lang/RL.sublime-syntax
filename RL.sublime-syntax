@@ -1421,7 +1421,7 @@ contexts:
           set: type-qualifier-step-indirection
     - include: type-qualifier-step-indirection
   type-qualifier-step-indirection:
-    - match: ([*\\@^]|\.{2}[!?])
+    - match: ([*\\^]|\.{2}[!?])
       scope: storage.modifier.indirection.rl
       set: type-qualifier
     - match: \[
@@ -1774,7 +1774,7 @@ contexts:
           set: [expression-pop-bracket, expression]
         - match: \#(?=\s*\])
           scope: keyword.operator.rl
-          set: [expression-pop-bracket]
+          set: expression-pop-bracket
         - match: (?=\])
           set: expression-pop-bracket
         - match: (?=\S)
