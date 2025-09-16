@@ -1543,7 +1543,7 @@ contexts:
         - match: \.{2}[!?]
           scope: invalid.illegal
         - include: expression
-    - match: (\||\+[\+:]?|-[-:]?|~:?|!:?|\*|<-|&|\\|##|\b(BSWAP|POPCNT|FIRST[01](BIT|POS)|PREFETCH(_READ|_WRITE|_CODE)?)\b)
+    - match: (\||\+[\+:]?|-[-:]?|~:?|!:?|\*|<-|&|\\|##|\b(BSWAP|POPCNT|(FIRST|LAST)[01](BIT|POS)|ILOG2|PREFETCH(_READ|_WRITE|_CODE)?|MASK)\b)
       scope: keyword.operator.rl
       set: expression
     - match: \>\>?\>?
@@ -1747,7 +1747,15 @@ contexts:
   expression-post-operator:
     - match: (\+\+|--)
       scope: keyword.operator.rl
+    - match: ([<>!=]=|[<>])\s*\b(MASK)\b
+      captures:
+        1: keyword.operator.rl
+        2: keyword.operator.rl
+      set: expression
     - match: (<>|<<<?=?|>>>?=?|\|\||&&|[-^+*/&%|<>]=?|:=:|[!:=]=)
+      scope: keyword.operator.rl
+      set: expression
+    - match: \b(R?AVG)\b
       scope: keyword.operator.rl
       set: expression
     - match: \b(AND)\b
